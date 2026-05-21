@@ -22,6 +22,9 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin", "latin-ext"],
   variable: "--font-jetbrains-mono",
   display: "swap",
+  // Mono is only used for small labels/numbers — keep it out of the
+  // critical preload path so the LCP serif/sans fonts load first.
+  preload: false,
 });
 
 export const metadata: Metadata = {

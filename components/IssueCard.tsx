@@ -32,9 +32,9 @@ export function IssueCard({
         <p className="font-mono text-xs uppercase tracking-wider text-secondary">
           {formatDateTR(issue.date)} · {issue.readingMinutes} dk okuma
         </p>
-        <h3 className="mt-2 font-serif text-2xl leading-snug transition-colors duration-200 group-hover:text-accent">
+        <h2 className="mt-2 font-serif text-2xl leading-snug transition-colors duration-200 group-hover:text-accent">
           {issue.title}
-        </h3>
+        </h2>
         <ul className="mt-4 space-y-1.5">
           {issue.trends.slice(0, 3).map((trend) => (
             <li

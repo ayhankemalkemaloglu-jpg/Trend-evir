@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TrendÇevir
 
-## Getting Started
+Dünyada çalışan iş trendlerini Türk girişimciler için her hafta filtreleyen
+haftalık bültenin pazarlama sitesi ve halka açık arşivi.
 
-First, run the development server:
+TrendÇevir **anonim** bir yayındır: marka her zaman "biz" diliyle konuşur, hiçbir
+yerde kurucu adı, kişisel biyografi veya bireysel imza yer almaz.
+
+## Teknoloji
+
+- **Next.js 15** (App Router, TypeScript)
+- **Tailwind CSS v4** + shadcn tarzı bileşenler
+- **MDX** — her bülten `content/issues/` altında bir `.mdx` dosyası
+- **Framer Motion** — ölçülü animasyonlar
+- **next/og** — her sayı için dinamik OpenGraph görseli
+- **beehiiv** — e-posta abonelikleri
+- **Plausible** — gizlilik dostu analitik
+
+## Hızlı başlangıç
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local   # değerleri doldur (opsiyonel — boşken de site çalışır)
+pnpm dev                     # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Komutlar:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Komut         | Açıklama                          |
+| ------------- | --------------------------------- |
+| `pnpm dev`    | Geliştirme sunucusu               |
+| `pnpm build`  | Production derlemesi              |
+| `pnpm start`  | Derlenmiş çıktıyı sunar           |
+| `pnpm lint`   | ESLint                            |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Ortam değişkenleri
 
-## Learn More
+Tümü opsiyoneldir; tanımlı değilse ilgili özellik zarifçe devre dışı kalır
+(form "servis yapılandırılmadı" mesajı döner, analitik script yüklenmez).
 
-To learn more about Next.js, take a look at the following resources:
+| Değişken                        | Açıklama                                                        |
+| ------------------------------- | -------------------------------------------------------------- |
+| `BEEHIIV_API_KEY`               | beehiiv API anahtarı (abonelik)                                |
+| `BEEHIIV_PUBLICATION_ID`        | beehiiv yayın ID'si (`pub_...`)                                |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`  | Plausible'da kayıtlı alan adı, örn. `trendcevir.com`           |
+| `RESEND_API_KEY`                | İletişim formu e-postaları için Resend anahtarı                |
+| `CONTACT_TO`                    | İletişim mesajlarının gideceği adres                           |
+| `CONTACT_FROM`                  | Doğrulanmış Resend gönderen, örn. `TrendÇevir <site@...>`      |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Otomasyon hattı için (aşağıya bakın): `ANTHROPIC_API_KEY`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## İçerik: yeni bülten ekleme
 
-## Deploy on Vercel
+Her bülten `content/issues/NNN-slug.mdx` biçiminde bir dosyadır. Frontmatter:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```mdx
+---
+issue: 1
+title: "Başlık"
+date: "2026-05-18"
+excerpt: "Tek cümlelik özet."
+tint: "#2a2f45"            # kapak görselinin rengi
+categories: ["Hizmet", "Perakende"]
+trends: ["Trend A", "Trend B"]
+---
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Gövdede özel bileşenler kullanılır:
+
+- `<Trend name="" country="" countryCode="JP" score={7} category="Hizmet">…</Trend>`
+- `<Evidence>…</Evidence>` — kanıt/sayılar
+- `<TurkeyAngle>…</TurkeyAngle>` — Türkiye uyarlaması
+- `<RiskFlags>…</RiskFlags>` — riskler
+
+Bültenler asla bir kişi tarafından imzalanmaz; sayfa altında imza
+"— TrendÇevir Yazı İşleri" olarak görünür.
+
+## Otomatik bülten taslağı (opsiyonel)
+
+`.github/workflows/weekly-issue.yml`, her hafta (ve elle tetiklendiğinde)
+`scripts/generate-issue.mjs` çalıştırır. Bu script Claude'un web arama aracıyla
+güncel, yurtdışında çalışan ama Türkiye'de olmayan trendleri araştırır, ev
+formatında bir MDX taslağı üretir ve **inceleme için bir Pull Request açar** —
+yayın insan onayından geçer (markanın editöryal kuralı).
+
+Gerekli GitHub secret: `ANTHROPIC_API_KEY`. Model `ANTHROPIC_MODEL` ile
+değiştirilebilir (varsayılan: `claude-sonnet-4-6`).
+
+Yerelde denemek için:
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-... node scripts/generate-issue.mjs
+```
+
+## Deploy
+
+### Vercel (önerilen)
+
+1. Repoyu Vercel'e içe aktar (framework otomatik algılanır).
+2. Ortam değişkenlerini ekle.
+3. Deploy. Her `main` push'unda otomatik yayınlanır.
+
+### Render
+
+`render.yaml` blueprint dahildir. Render'da "New → Blueprint" ile repoyu seç,
+ortam değişkenlerini gir, deploy et.
+
+## Erişilebilirlik & performans
+
+- Tüm sayfalar statik/SSG; paylaşılan JS ~102 kB.
+- Fontlar `next/font` ile optimize; görseller harici bağımlılık olmadan SVG.
+- Gövde metni AAA kontrast; tüm etkileşimler klavyeyle erişilebilir.
+- `prefers-reduced-motion` desteklenir.
