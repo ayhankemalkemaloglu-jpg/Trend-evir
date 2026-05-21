@@ -1,0 +1,27 @@
+# Render blueprint for TrendÇevir (Next.js).
+# Render → New → Blueprint → pick this repo, then set the env vars below.
+services:
+  - type: web
+    name: trendcevir
+    runtime: node
+    plan: starter
+    region: frankfurt
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    startCommand: pnpm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: BEEHIIV_API_KEY
+        sync: false
+      - key: BEEHIIV_PUBLICATION_ID
+        sync: false
+      - key: NEXT_PUBLIC_PLAUSIBLE_DOMAIN
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: CONTACT_TO
+        sync: false
+      - key: CONTACT_FROM
+        sync: false
