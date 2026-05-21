@@ -1,0 +1,60 @@
+name: Haftalık bülten taslağı
+
+# Her perşembe 06:00 UTC (09:00 TRT) — Pazartesi yayınından önce editör incelemesi
+# için bir taslak PR'ı açar. Elle de tetiklenebilir.
+on:
+  schedule:
+    - cron: "0 6 * * 4"
+  workflow_dispatch:
+    inputs:
+      trend_count:
+        description: "Kaç trend taslağa girsin?"
+        required: false
+        default: "3"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Taslağı üret
+        id: gen
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+          TREND_COUNT: ${{ github.event.inputs.trend_count }}
+        run: node scripts/generate-issue.mjs
+
+      - name: İnceleme PR'ı aç
+        if: steps.gen.outputs.slug != ''
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: auto/issue-${{ steps.gen.outputs.issue }}
+          commit-message: "Taslak: ${{ steps.gen.outputs.title }}"
+          title: "Bülten taslağı — Sayı ${{ steps.gen.outputs.issue }}: ${{ steps.gen.outputs.title }}"
+          body: |
+            Bu PR, haftalık otomasyon tarafından üretilmiş bir **taslaktır**.
+
+            - Claude + web araması ile hazırlandı, ardından insan editör onayı bekler.
+            - Lütfen kanıtları (sayılar, kaynaklar), Türkiye uyum skorlarını ve dili gözden geçir.
+            - Marka kuralı: anonim ses, "biz" dili, kişisel imza yok.
+
+            Onaylayıp merge edince site otomatik olarak yeni sayıyı yayınlar.
+          labels: |
+            otomatik-taslak
+            inceleme-bekliyor
+          delete-branch: true
