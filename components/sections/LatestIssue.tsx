@@ -4,10 +4,13 @@ import { ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/sections/SectionHeading";
 import { CoverArt } from "@/components/CoverArt";
-import { latestIssue } from "@/lib/content";
+import { getLatestIssue } from "@/lib/mdx";
 import { formatDateTR, issueNo } from "@/lib/format";
 
 export function LatestIssue() {
+  const latest = getLatestIssue();
+  if (!latest) return null;
+
   return (
     <section className="border-t border-border bg-surface/30">
       <div className="container-px mx-auto max-w-6xl py-20 md:py-28">
@@ -17,31 +20,31 @@ export function LatestIssue() {
 
         <Reveal delay={0.08} className="mt-12">
           <Link
-            href={latestIssue.href}
+            href={`/arsiv/${latest.slug}`}
             className="group grid overflow-hidden rounded-2xl border border-border bg-surface transition-colors duration-300 hover:border-accent/50 md:grid-cols-2"
           >
             <CoverArt
-              tint={latestIssue.tint}
+              tint={latest.tint}
               rounded="rounded-none"
               className="aspect-[16/10] md:aspect-auto md:h-full"
             >
               <div className="absolute bottom-5 left-5">
                 <span className="rounded-full bg-background/60 px-3 py-1 font-mono text-xs text-accent backdrop-blur-sm">
-                  {issueNo(latestIssue.number)}
+                  {issueNo(latest.issue)}
                 </span>
               </div>
             </CoverArt>
 
             <div className="flex flex-col justify-center p-8 md:p-12">
               <p className="font-mono text-xs uppercase tracking-wider text-secondary">
-                {formatDateTR(latestIssue.date)}
+                {formatDateTR(latest.date)} · {latest.readingMinutes} dk okuma
               </p>
               <h3 className="mt-4 font-serif text-3xl leading-tight md:text-4xl">
-                {latestIssue.title}
+                {latest.title}
               </h3>
 
               <ul className="mt-6 space-y-2.5">
-                {latestIssue.trends.map((trend) => (
+                {latest.trends.slice(0, 3).map((trend) => (
                   <li
                     key={trend}
                     className="flex items-center gap-3 text-secondary"

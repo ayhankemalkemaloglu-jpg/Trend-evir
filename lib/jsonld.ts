@@ -1,4 +1,5 @@
 import { siteConfig } from "@/lib/site";
+import type { IssueMeta } from "@/lib/mdx";
 
 /** Organization schema — intentionally has NO founder field (anonymous brand). */
 export function organizationSchema() {
@@ -25,5 +26,25 @@ export function websiteSchema() {
     name: siteConfig.name,
     url: siteConfig.url,
     inLanguage: "tr-TR",
+  };
+}
+
+/** Article schema — author is the editorial team, never an individual. */
+export function articleSchema(meta: IssueMeta) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: meta.title,
+    description: meta.excerpt,
+    datePublished: meta.date,
+    dateModified: meta.date,
+    inLanguage: "tr-TR",
+    author: { "@type": "Organization", name: "TrendÇevir Yazı İşleri" },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+    mainEntityOfPage: `${siteConfig.url}/arsiv/${meta.slug}`,
   };
 }

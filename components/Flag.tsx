@@ -82,16 +82,29 @@ function USAFlag() {
   );
 }
 
+function TurkeyFlag() {
+  return (
+    <>
+      <rect width="24" height="24" fill="#e30a17" />
+      <circle cx="9.5" cy="12" r="4.6" fill="#ffffff" />
+      <circle cx="11.2" cy="12" r="3.6" fill="#e30a17" />
+      <polygon points={starPoints(15.4, 12, 2.1, 0.85, -90)} fill="#ffffff" />
+    </>
+  );
+}
+
 const FLAGS: Record<string, () => React.ReactElement> = {
   JP: JapanFlag,
   CN: ChinaFlag,
   US: USAFlag,
+  TR: TurkeyFlag,
 };
 
 const COUNTRY_NAMES: Record<string, string> = {
   JP: "Japonya",
   CN: "Çin",
   US: "ABD",
+  TR: "Türkiye",
 };
 
 export function Flag({

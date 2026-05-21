@@ -75,16 +75,6 @@ export const showcaseTrends: Trend[] = [
   },
 ];
 
-export const latestIssue = {
-  number: 1,
-  slug: "001-ilk-sayi",
-  date: "2026-05-18",
-  title: "Uyku, sürpriz kutular ve fonksiyonel su",
-  trends: ["Sleep Tourism Otelleri", "Blind Box Vending", "Fonksiyonel Su Barları"],
-  href: "/arsiv/001-ilk-sayi",
-  tint: "#2a2f45",
-} as const;
-
 /**
  * Placeholder testimonials — fictional names + companies, written to sound
  * like real Turkish founders. Swap with consented quotes before launch.
