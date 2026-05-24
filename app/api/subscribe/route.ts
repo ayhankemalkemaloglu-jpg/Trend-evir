@@ -37,10 +37,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  if (result.reason === "already_subscribed") {
+    return NextResponse.json({
+      ok: true,
+      message: "Bu e-posta adresi zaten aboneler arasında.",
+    });
+  }
+
   if (result.reason === "config") {
     return NextResponse.json(
       { ok: false, message: "Abonelik servisi şu an yapılandırılmadı." },
       { status: 503 },
+    );
+  }
+
+  if (result.reason === "invalid") {
+    return NextResponse.json(
+      { ok: false, message: "Bu e-posta adresi abonelik için kabul edilmedi." },
+      { status: 422 },
     );
   }
 

@@ -1,6 +1,5 @@
 import { SignupForm } from "@/components/SignupForm";
 import { Reveal } from "@/components/Reveal";
-import { siteConfig } from "@/lib/site";
 
 export function FinalCTA() {
   return (
@@ -24,10 +23,7 @@ export function FinalCTA() {
           <div className="mx-auto mt-10 max-w-xl">
             <SignupForm source="final-cta" />
             <p className="mt-3 text-sm text-secondary">
-              <span className="font-mono text-accent tabular">
-                {siteConfig.subscriberCount}
-              </span>{" "}
-              girişimci aboneye katıl. Spam yok, istediğin an çık.
+              Spam yok, istediğin an çık. Trendleri Türkiye merceğinden oku.
             </p>
           </div>
         </Reveal>

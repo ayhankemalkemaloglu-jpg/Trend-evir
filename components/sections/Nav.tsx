@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
@@ -10,6 +10,19 @@ import { navLinks } from "@/lib/site";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
