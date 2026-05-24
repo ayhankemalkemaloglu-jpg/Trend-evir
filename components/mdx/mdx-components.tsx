@@ -6,6 +6,26 @@ import { cn } from "@/lib/utils";
 
 /* ----------------------------- custom blocks ----------------------------- */
 
+function slugifyTrendName(input: string) {
+  const map: Record<string, string> = {
+    ç: "c",
+    ğ: "g",
+    ı: "i",
+    İ: "i",
+    ö: "o",
+    ş: "s",
+    ü: "u",
+  };
+
+  return input
+    .toLowerCase()
+    .replace(/[çğıİöşü]/g, (char) => map[char] ?? char)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function Trend({
   name,
   country,
@@ -22,7 +42,10 @@ function Trend({
   children?: ReactNode;
 }) {
   return (
-    <section className="my-12 scroll-mt-28 rounded-2xl border border-border bg-surface p-6 md:p-8">
+    <section
+      id={slugifyTrendName(name)}
+      className="my-12 scroll-mt-28 rounded-2xl border border-border bg-surface p-6 md:p-8"
+    >
       <div className="flex flex-wrap items-center gap-3">
         <Flag code={countryCode} size={34} />
         <p className="font-mono text-xs uppercase tracking-wider text-secondary">

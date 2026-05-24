@@ -1,25 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
+
+const READ_THRESHOLD = 65;
 
 export function ReadingProgress({ slug }: { slug: string }) {
   const [progress, setProgress] = useState(0);
+  const trackedReadRef = useRef(false);
 
   useEffect(() => {
-    trackEvent("issue_read", { slug });
-  }, [slug]);
+    trackedReadRef.current = false;
 
-  useEffect(() => {
     const onScroll = () => {
       const el = document.documentElement;
       const max = el.scrollHeight - el.clientHeight;
-      setProgress(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 0);
+      const nextProgress =
+        max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 0;
+
+      setProgress(nextProgress);
+
+      if (!trackedReadRef.current && nextProgress >= READ_THRESHOLD) {
+        trackedReadRef.current = true;
+        trackEvent("issue_read", { slug, threshold: READ_THRESHOLD });
+      }
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [slug]);
 
   return (
     <div

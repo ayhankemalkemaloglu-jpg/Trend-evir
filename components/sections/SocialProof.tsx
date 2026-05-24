@@ -1,54 +1,53 @@
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/sections/SectionHeading";
-import { testimonials, mediaMentions } from "@/lib/content";
+
+const editorialPrinciples = [
+  {
+    title: "Kanıt ararız",
+    body: "Her trendi gelir, büyüme, mağaza sayısı veya yatırım gibi ölçülebilir sinyallerle süzeriz.",
+  },
+  {
+    title: "Türkiye merceğiyle bakarız",
+    body: "Yurtdışında çalışan fikri olduğu gibi taşımayız; yerel satın alma gücü, mevzuat ve kültürle yeniden okuruz.",
+  },
+  {
+    title: "Küçük başlamayı önemseriz",
+    body: "Her sayıda fikrin en hafif pilotunu, risklerini ve hızlı test edilebilecek versiyonunu anlatırız.",
+  },
+] as const;
 
 export function SocialProof() {
   return (
     <section className="container-px mx-auto max-w-6xl py-20 md:py-28">
       <Reveal>
         <SectionHeading
-          kicker="Abonelerden"
-          title="Girişimciler ne diyor?"
+          kicker="Yayın ilkeleri"
+          title="Sinyali gürültüden ayırıyoruz."
           align="center"
         />
       </Reveal>
 
       <div className="mt-14 grid gap-6 md:grid-cols-3">
-        {testimonials.map((t, i) => (
+        {editorialPrinciples.map((principle, i) => (
           <Reveal
-            key={t.name}
+            key={principle.title}
             delay={i * 0.07}
             className="flex flex-col rounded-2xl border border-border bg-surface p-7"
           >
-            <span aria-hidden className="font-serif text-5xl leading-none text-accent/50">
-              &ldquo;
-            </span>
-            <blockquote className="mt-2 flex-1 text-pretty leading-relaxed text-foreground/90">
-              {t.quote}
-            </blockquote>
-            <figcaption className="mt-6 border-t border-border pt-5">
-              <p className="font-medium text-foreground">{t.name}</p>
-              <p className="text-sm text-secondary">{t.role}</p>
-            </figcaption>
+            <p className="font-serif text-2xl text-foreground">{principle.title}</p>
+            <p className="mt-4 flex-1 text-pretty leading-relaxed text-foreground/85">
+              {principle.body}
+            </p>
           </Reveal>
         ))}
       </div>
 
       <Reveal delay={0.1}>
-        <div className="mt-16">
-          <p className="text-center font-mono text-xs uppercase tracking-[0.2em] text-secondary">
-            Hakkımızda yazıldı
+        <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-accent/20 bg-accent/[0.06] p-6 text-center">
+          <p className="text-sm leading-relaxed text-foreground/85">
+            TrendÇevir anonim bir yayındır. Gerçek, izinli okuyucu yorumları ve
+            basın bağlantıları oluşana kadar sahte sosyal kanıt göstermiyoruz.
           </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
-            {mediaMentions.map((name) => (
-              <span
-                key={name}
-                className="font-serif text-xl text-secondary/70 transition-colors duration-200 hover:text-secondary"
-              >
-                {name}
-              </span>
-            ))}
-          </div>
         </div>
       </Reveal>
     </section>

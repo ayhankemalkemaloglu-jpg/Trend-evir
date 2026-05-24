@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 
@@ -22,13 +23,22 @@ export function SignupForm({
   placeholder?: string;
 }) {
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [website, setWebsite] = useState(""); // honeypot
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const describedBy =
+    status === "error" ? "signup-consent signup-error" : "signup-consent";
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (status === "loading") return;
+
+    if (!consent) {
+      setStatus("error");
+      setMessage("Devam etmek için gizlilik ve yurt dışı aktarım onayını işaretle.");
+      return;
+    }
 
     setStatus("loading");
     setMessage("");
@@ -38,7 +48,7 @@ export function SignupForm({
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, website }),
+        body: JSON.stringify({ email, consent, website }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         ok?: boolean;
@@ -49,6 +59,7 @@ export function SignupForm({
         setStatus("success");
         trackEvent("signup_success", { source });
         setEmail("");
+        setConsent(false);
         return;
       }
 
@@ -85,7 +96,7 @@ export function SignupForm({
       onSubmit={onSubmit}
       noValidate
       className={cn("w-full", className)}
-      aria-describedby={status === "error" ? "signup-error" : undefined}
+      aria-describedby={describedBy}
     >
       <div className="flex flex-col gap-3 sm:flex-row">
         <label htmlFor={`email-${source}`} className="sr-only">
@@ -101,6 +112,7 @@ export function SignupForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           aria-invalid={status === "error"}
+          aria-describedby={describedBy}
           className="sm:flex-1"
         />
 
@@ -136,6 +148,32 @@ export function SignupForm({
           )}
         </Button>
       </div>
+
+      <label
+        id="signup-consent"
+        htmlFor={`consent-${source}`}
+        className="mt-3 flex items-start gap-2.5 text-left text-xs leading-relaxed text-secondary"
+      >
+        <input
+          id={`consent-${source}`}
+          type="checkbox"
+          required
+          checked={consent}
+          onChange={(e) => setConsent(e.target.checked)}
+          className="mt-0.5 size-4 shrink-0 rounded border-border bg-surface accent-accent"
+          aria-invalid={status === "error" && !consent}
+        />
+        <span>
+          <Link
+            href="/gizlilik"
+            className="text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
+          >
+            Gizlilik politikasını
+          </Link>{" "}
+          okudum; e-posta adresimin beehiiv aracılığıyla yurt dışında
+          işlenmesine açık rıza veriyorum.
+        </span>
+      </label>
 
       {status === "error" && (
         <p

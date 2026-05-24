@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_NAME_LENGTH = 100;
+const MAX_MESSAGE_LENGTH = 5000;
+
+function stripHeaderControlChars(value: string) {
+  return value.replace(/[\r\n\x00-\x1f\x7f]+/g, " ").trim();
+}
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -13,7 +19,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { name, email, message, website } = (body ?? {}) as Record<
+  const { name, email, message, consent, website } = (body ?? {}) as Record<
     string,
     unknown
   >;
@@ -23,16 +29,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  const normalizedName = typeof name === "string" ? stripHeaderControlChars(name) : "";
+  const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+  const normalizedMessage = typeof message === "string" ? message.trim() : "";
+
   if (
-    typeof name !== "string" ||
-    name.trim().length < 2 ||
-    typeof email !== "string" ||
-    !EMAIL_RE.test(email.trim()) ||
-    typeof message !== "string" ||
-    message.trim().length < 10
+    normalizedName.length < 2 ||
+    normalizedName.length > MAX_NAME_LENGTH ||
+    !EMAIL_RE.test(normalizedEmail) ||
+    normalizedMessage.length < 10 ||
+    normalizedMessage.length > MAX_MESSAGE_LENGTH
   ) {
     return NextResponse.json(
-      { ok: false, message: "Lütfen tüm alanları eksiksiz doldur." },
+      { ok: false, message: "Lütfen tüm alanları eksiksiz ve makul uzunlukta doldur." },
+      { status: 422 },
+    );
+  }
+
+  if (consent !== true) {
+    return NextResponse.json(
+      { ok: false, message: "Devam etmek için gizlilik onayı gerekli." },
       { status: 422 },
     );
   }
@@ -58,9 +74,9 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         from,
         to: [to],
-        reply_to: email.trim(),
-        subject: `TrendÇevir iletişim — ${name.trim()}`,
-        text: `Gönderen: ${name.trim()} <${email.trim()}>\n\n${message.trim()}`,
+        reply_to: normalizedEmail,
+        subject: `TrendÇevir iletişim — ${normalizedName}`,
+        text: `Gönderen: ${normalizedName} <${normalizedEmail}>\n\n${normalizedMessage}`,
       }),
       signal: AbortSignal.timeout(8000),
     });

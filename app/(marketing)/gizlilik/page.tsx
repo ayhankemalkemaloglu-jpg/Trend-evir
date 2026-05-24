@@ -59,9 +59,8 @@ export default function PrivacyPage() {
         <p>
           Yalnızca bültene abone olurken paylaştığınız{" "}
           <strong className="text-foreground">e-posta adresinizi</strong>{" "}
-          topluyoruz. Bunun dışında ad, telefon veya benzeri kimlik bilgisi
-          talep etmiyoruz. İletişim formunu kullanırsanız, ilettiğiniz ad ve
-          mesaj içeriği yalnızca size dönüş yapmak için işlenir.
+          topluyoruz. İletişim formunu kullanırsanız, ilettiğiniz ad, e-posta
+          adresi ve mesaj içeriği yalnızca size dönüş yapmak için işlenir.
         </p>
       </Section>
 
@@ -75,11 +74,12 @@ export default function PrivacyPage() {
 
       <Section title="4. Yurt Dışına Aktarım">
         <p>
-          Abonelik ve e-posta gönderim altyapısı için beehiiv hizmetini
-          kullanıyoruz. Bu nedenle e-posta adresiniz, hizmetin sunucularının
-          bulunduğu yurt dışı (ABD) lokasyonlarında işlenebilir. Aktarım, KVKK
-          kapsamında açık rızanıza dayanılarak gerçekleştirilir; aboneliğinizi
-          dilediğiniz an iptal edebilirsiniz.
+          Abonelik ve e-posta gönderim altyapısı için beehiiv, iletişim formu
+          mesajlarının iletimi için Resend hizmetini kullanıyoruz. Bu nedenle
+          e-posta adresiniz ve iletişim formunda paylaştığınız bilgiler, ilgili
+          hizmetlerin sunucularının bulunduğu yurt dışı lokasyonlarda
+          işlenebilir. Aktarım, KVKK kapsamında açık rızanıza dayanılarak
+          gerçekleştirilir; aboneliğinizi dilediğiniz an iptal edebilirsiniz.
         </p>
       </Section>
 
@@ -95,6 +95,8 @@ export default function PrivacyPage() {
       <Section title="6. Saklama Süresi">
         <p>
           E-posta adresiniz, aboneliğiniz devam ettiği sürece saklanır.
+          İletişim formu mesajları, talebinizi sonuçlandırmak ve gerektiğinde
+          geçmiş yazışmayı takip edebilmek için makul süreyle saklanır.
           Aboneliğinizi iptal ettiğinizde veya silme talebinde bulunduğunuzda,
           veriniz makul süre içinde sistemlerimizden kaldırılır.
         </p>

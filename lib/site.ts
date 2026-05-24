@@ -15,17 +15,10 @@ export const siteConfig = {
   description:
     "Her Pazartesi sabah, yurtdışında çalışan iş trendlerini Türk girişimcilere getiriyoruz. Üç dakikalık okuma, milyon dolarlık fikirler.",
   contactEmail: "iletisim@trendcevir.com",
-  // Placeholder — swap with the live beehiiv subscriber count.
-  subscriberCount: 847,
   social: {
     instagram: "https://instagram.com/trendcevir",
     x: "https://x.com/trendcevir",
     linkedin: "https://linkedin.com/company/trendcevir",
-  },
-  stats: {
-    countries: 12,
-    trends: 47,
-    openRate: 62,
   },
 } as const;
 

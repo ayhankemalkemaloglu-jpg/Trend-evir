@@ -1,5 +1,4 @@
 import { SignupForm } from "@/components/SignupForm";
-import { siteConfig } from "@/lib/site";
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
@@ -46,29 +45,20 @@ export function Hero() {
         <div id="bulten" className="mx-auto mt-10 max-w-xl scroll-mt-28">
           <SignupForm source="hero" />
           <p className="mt-3 text-sm text-secondary">
-            <span className="font-mono text-accent tabular">
-              {siteConfig.subscriberCount}
-            </span>{" "}
-            girişimci aboneye katıl. Spam yok, istediğin an çık.
+            Spam yok, istediğin an çık. Her sayı doğrudan kutuna gelir.
           </p>
         </div>
 
         <div className="mx-auto mt-12 flex max-w-2xl flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-x-7">
-          <Stat
-            value={String(siteConfig.stats.countries)}
-            label="ülke takip ediliyor"
-          />
+          <Stat value="Pzt" label="09:00'da yayında" />
           <span aria-hidden className="hidden text-border sm:inline">
             ·
           </span>
-          <Stat value={String(siteConfig.stats.trends)} label="trend incelendi" />
+          <Stat value="3 dk" label="ortalama okuma" />
           <span aria-hidden className="hidden text-border sm:inline">
             ·
           </span>
-          <Stat
-            value={`%${siteConfig.stats.openRate}`}
-            label="haftalık açılma oranı"
-          />
+          <Stat value="TR" label="uyarlama notları" />
         </div>
       </div>
 

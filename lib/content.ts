@@ -51,7 +51,7 @@ export const showcaseTrends: Trend[] = [
     adaptationScore: 7,
     category: "Hizmet",
     tint: "#3b4a6b",
-    href: "/arsiv/001-ilk-sayi",
+    href: "/arsiv/001-ilk-sayi#sleep-tourism-otelleri",
   },
   {
     name: "Blind Box Vending",
@@ -61,7 +61,7 @@ export const showcaseTrends: Trend[] = [
     adaptationScore: 8,
     category: "Perakende",
     tint: "#6b3b54",
-    href: "/arsiv/001-ilk-sayi",
+    href: "/arsiv/001-ilk-sayi#blind-box-vending",
   },
   {
     name: "Fonksiyonel Su Barları",
@@ -71,39 +71,6 @@ export const showcaseTrends: Trend[] = [
     adaptationScore: 6,
     category: "Yeme-İçme",
     tint: "#3b6b5a",
-    href: "/arsiv/001-ilk-sayi",
+    href: "/arsiv/001-ilk-sayi#fonksiyonel-su-barlari",
   },
 ];
-
-/**
- * Placeholder testimonials — fictional names + companies, written to sound
- * like real Turkish founders. Swap with consented quotes before launch.
- */
-export const testimonials = [
-  {
-    quote:
-      "Pazartesi ilk açtığım e-posta bu. Bir trendi rakiplerimden önce görmek tek başına aboneliğin hakkını veriyor.",
-    name: "Deniz Aksoy",
-    role: "Kurucu, Marn Studio",
-  },
-  {
-    quote:
-      "Uyum skoru bölümü çok işime yarıyor. “İlginç ama bize göre değil” ile “yarın başlarım” arasındaki farkı hızlıca görüyorum.",
-    name: "Elif Şahin",
-    role: "Kurucu Ortak, Köprü Ventures",
-  },
-  {
-    quote:
-      "Üç dakikada okuyup bir hafta üzerine düşünüyorum. Sektör bültenlerinin çoğu gürültü; bu sinyal.",
-    name: "Caner Yıldırım",
-    role: "Genel Müdür, Lokma Brands",
-  },
-] as const;
-
-/** Placeholder media-mention slots — rendered as plain wordmarks. */
-export const mediaMentions = [
-  "Webrazzi",
-  "Hürriyet",
-  "Fortune Türkiye",
-  "Webtekno",
-] as const;

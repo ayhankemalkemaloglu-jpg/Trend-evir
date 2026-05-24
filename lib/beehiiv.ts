@@ -7,7 +7,10 @@ const BEEHIIV_API_BASE = "https://api.beehiiv.com/v2";
 
 export type SubscribeResult =
   | { ok: true }
-  | { ok: false; reason: "config" | "rejected" | "network" };
+  | {
+      ok: false;
+      reason: "config" | "already_subscribed" | "invalid" | "rejected" | "network";
+    };
 
 export async function subscribeToBeehiiv(
   email: string,
@@ -41,6 +44,14 @@ export async function subscribeToBeehiiv(
         signal: AbortSignal.timeout(8000),
       },
     );
+
+    if (res.status === 409) {
+      return { ok: false, reason: "already_subscribed" };
+    }
+
+    if (res.status === 400 || res.status === 422) {
+      return { ok: false, reason: "invalid" };
+    }
 
     if (!res.ok) {
       return { ok: false, reason: "rejected" };
