@@ -1,3 +1,9 @@
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+# Build-script decisions for native deps. pnpm refuses to run dependency
+# build scripts until each is explicitly allowed (true) or denied (false).
+#
+# This is an SVG-only marketing site: next/og renders via wasm and there are
+# no raster images to optimise, so the sharp native binary isn't needed at
+# build time. Denying these keeps installs deterministic and offline-friendly.
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
