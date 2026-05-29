@@ -22,7 +22,7 @@ export function FinalCTA() {
         </Reveal>
         <Reveal delay={0.08}>
           <div className="mx-auto mt-10 max-w-xl">
-            <SignupForm source="final-cta" />
+            <SignupForm source="final-cta" showCategories />
             <p className="mt-3 text-sm text-secondary">
               <span className="font-mono text-accent tabular">
                 {siteConfig.subscriberCount}

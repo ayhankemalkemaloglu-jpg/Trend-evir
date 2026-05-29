@@ -11,7 +11,7 @@ export type SubscribeResult =
 
 export async function subscribeToBeehiiv(
   email: string,
-  opts: { referringSite?: string } = {},
+  opts: { referringSite?: string; categories?: string[] } = {},
 ): Promise<SubscribeResult> {
   const apiKey = process.env.BEEHIIV_API_KEY;
   const publicationId = process.env.BEEHIIV_PUBLICATION_ID;
@@ -19,6 +19,12 @@ export async function subscribeToBeehiiv(
   if (!apiKey || !publicationId) {
     return { ok: false, reason: "config" };
   }
+
+  // Stored as a custom field so new issues can be segmented by interest.
+  // (Create a "Kategoriler" custom field in beehiiv for it to be retained.)
+  const customFields = opts.categories?.length
+    ? [{ name: "Kategoriler", value: opts.categories.join(", ") }]
+    : undefined;
 
   try {
     const res = await fetch(
@@ -36,6 +42,7 @@ export async function subscribeToBeehiiv(
           utm_source: "trendcevir.com",
           utm_medium: "organic",
           referring_site: opts.referringSite ?? "trendcevir.com",
+          ...(customFields ? { custom_fields: customFields } : {}),
         }),
         // beehiiv responds quickly; avoid hanging the request indefinitely.
         signal: AbortSignal.timeout(8000),
