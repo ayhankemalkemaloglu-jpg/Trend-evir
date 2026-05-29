@@ -3,6 +3,11 @@ import { AlertTriangle } from "lucide-react";
 
 import { ActionPlan } from "@/components/mdx/ActionPlan";
 import { Flag } from "@/components/Flag";
+import {
+  ScoreBreakdown,
+  weightedScore,
+  type ScoreBreakdownData,
+} from "@/components/trend/ScoreBreakdown";
 import { cn } from "@/lib/utils";
 
 /* ----------------------------- custom blocks ----------------------------- */
@@ -13,6 +18,7 @@ function Trend({
   countryCode,
   score,
   category,
+  scoreBreakdown,
   children,
 }: {
   name: string;
@@ -20,8 +26,13 @@ function Trend({
   countryCode: string;
   score: number;
   category: string;
+  scoreBreakdown?: ScoreBreakdownData;
   children?: ReactNode;
 }) {
+  // When a breakdown is supplied it becomes the source of truth; otherwise we
+  // keep the author-assigned single score (backward compatible).
+  const displayScore = scoreBreakdown ? weightedScore(scoreBreakdown) : score;
+
   return (
     <section className="my-12 scroll-mt-28 rounded-2xl border border-border bg-surface p-6 md:p-8">
       <div className="flex flex-wrap items-center gap-3">
@@ -31,7 +42,9 @@ function Trend({
         </p>
         <span className="ml-auto inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3 py-1.5 text-xs text-accent">
           Uyum Skoru
-          <span className="font-mono font-semibold tabular">{score}/10</span>
+          <span className="font-mono font-semibold tabular">
+            {displayScore}/10
+          </span>
         </span>
       </div>
       <h2 className="mt-4 mb-0 font-serif text-3xl leading-tight tracking-tight md:text-4xl">
@@ -42,6 +55,7 @@ function Trend({
           {children}
         </div>
       )}
+      {scoreBreakdown && <ScoreBreakdown data={scoreBreakdown} />}
     </section>
   );
 }
