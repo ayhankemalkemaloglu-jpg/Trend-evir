@@ -15,10 +15,12 @@ import { JsonLd } from "@/components/JsonLd";
 import { mdxComponents } from "@/components/mdx/mdx-components";
 import {
   getAdjacentIssues,
+  getAllTrends,
   getIssueMeta,
   getIssueSlugs,
   getIssueSource,
 } from "@/lib/mdx";
+import { remarkAutolinkTrends } from "@/lib/remark-autolink-trends";
 import { formatDateTR, issueNo } from "@/lib/format";
 import { articleSchema } from "@/lib/jsonld";
 import { siteConfig } from "@/lib/site";
@@ -74,12 +76,22 @@ export default async function IssuePage({
   shareLines.push(`→ ${shareUrl}`, "#TrendÇevir #Girişim");
   const shareSnippet = shareLines.join("\n");
 
+  // Link the first prose mention of any known trend to its /trend/[slug] hub.
+  // The custom <Trend> blocks are skipped by the plugin, so only narrative
+  // text (e.g. the wrap-up paragraph) is touched.
+  const trendRefs = getAllTrends().map((t) => ({ name: t.name, slug: t.slug }));
+
   const { content } = await compileMDX({
     source: getIssueSource(slug),
     components: mdxComponents,
     options: {
       parseFrontmatter: true,
-      mdxOptions: { remarkPlugins: [remarkGfm] },
+      mdxOptions: {
+        remarkPlugins: [
+          remarkGfm,
+          [remarkAutolinkTrends, { trends: trendRefs }],
+        ],
+      },
     },
   });
 
