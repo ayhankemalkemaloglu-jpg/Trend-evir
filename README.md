@@ -32,6 +32,7 @@ Komutlar:
 | `pnpm build`  | Production derlemesi              |
 | `pnpm start`  | Derlenmiş çıktıyı sunar           |
 | `pnpm lint`   | ESLint                            |
+| `pnpm test`   | Vitest birim testleri             |
 
 ## Ortam değişkenleri
 
