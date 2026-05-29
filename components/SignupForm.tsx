@@ -6,25 +6,42 @@ import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trackEvent } from "@/lib/analytics";
+import { categories } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 type Status = "idle" | "loading" | "success" | "error";
+
+// "Tümü" is a filter, not an interest a subscriber can opt into.
+const INTERESTS = categories.filter((c) => c !== "Tümü");
 
 export function SignupForm({
   className,
   source = "landing",
   buttonLabel = "Abone Ol",
   placeholder = "ornek@eposta.com",
+  showCategories = false,
+  glass = false,
 }: {
   className?: string;
   source?: string;
   buttonLabel?: string;
   placeholder?: string;
+  /** Show optional interest-category toggles (saved to beehiiv). */
+  showCategories?: boolean;
+  /** Translucent glassmorphism styling (for use over the Hero shader). */
+  glass?: boolean;
 }) {
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState(""); // honeypot
+  const [selected, setSelected] = useState<string[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+
+  function toggleCategory(cat: string) {
+    setSelected((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat],
+    );
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,7 +55,11 @@ export function SignupForm({
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, website }),
+        body: JSON.stringify({
+          email,
+          website,
+          categories: showCategories ? selected : [],
+        }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         ok?: boolean;
@@ -101,7 +122,11 @@ export function SignupForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           aria-invalid={status === "error"}
-          className="sm:flex-1"
+          className={cn(
+            "sm:flex-1",
+            glass &&
+              "border-white/20 bg-white/10 backdrop-blur-md focus-visible:border-accent focus-visible:bg-white/15",
+          )}
         />
 
         {/* Honeypot: hidden from users + assistive tech, catches bots. */}
@@ -121,7 +146,10 @@ export function SignupForm({
           type="submit"
           size="lg"
           disabled={status === "loading"}
-          className="shrink-0"
+          className={cn(
+            "shrink-0",
+            glass && "shadow-lg shadow-accent/20 transition-shadow hover:shadow-accent/40",
+          )}
         >
           {status === "loading" ? (
             <>
@@ -136,6 +164,36 @@ export function SignupForm({
           )}
         </Button>
       </div>
+
+      {showCategories && (
+        <fieldset className="mt-4">
+          <legend className="mb-2 text-sm text-secondary">
+            İlgi alanların{" "}
+            <span className="text-secondary/60">(opsiyonel)</span>
+          </legend>
+          <div className="flex flex-wrap gap-2">
+            {INTERESTS.map((cat) => {
+              const active = selected.includes(cat);
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => toggleCategory(cat)}
+                  aria-pressed={active}
+                  className={cn(
+                    "rounded-full border px-3.5 py-1.5 text-sm transition-colors duration-200",
+                    active
+                      ? "border-accent bg-accent font-medium text-background"
+                      : "border-border text-secondary hover:border-accent/50 hover:text-foreground",
+                  )}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+      )}
 
       {status === "error" && (
         <p

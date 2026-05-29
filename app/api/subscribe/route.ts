@@ -1,7 +1,21 @@
 import { NextResponse } from "next/server";
 import { subscribeToBeehiiv } from "@/lib/beehiiv";
+import { categories } from "@/lib/content";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Interest categories a subscriber can opt into ("Tümü" is a filter, not a tag).
+const ALLOWED_CATEGORIES = new Set<string>(
+  categories.filter((c) => c !== "Tümü"),
+);
+
+function parseCategories(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  const valid = input.filter(
+    (c): c is string => typeof c === "string" && ALLOWED_CATEGORIES.has(c),
+  );
+  return [...new Set(valid)].slice(0, ALLOWED_CATEGORIES.size);
+}
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -14,9 +28,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const { email, website } = (body ?? {}) as {
+  const { email, website, categories: rawCategories } = (body ?? {}) as {
     email?: unknown;
     website?: unknown;
+    categories?: unknown;
   };
 
   // Honeypot: real users never fill this hidden field. Silently accept.
@@ -31,7 +46,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await subscribeToBeehiiv(email.trim().toLowerCase());
+  const result = await subscribeToBeehiiv(email.trim().toLowerCase(), {
+    categories: parseCategories(rawCategories),
+  });
 
   if (result.ok) {
     return NextResponse.json({ ok: true });

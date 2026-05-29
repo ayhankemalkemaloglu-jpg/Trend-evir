@@ -6,19 +6,28 @@ import remarkGfm from "remark-gfm";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { CoverArt } from "@/components/CoverArt";
+import { AppliedStories } from "@/components/AppliedStories";
+import { IssueSummary } from "@/components/IssueSummary";
+import { PremiumBadge } from "@/components/PremiumBadge";
+import { PremiumGate } from "@/components/PremiumGate";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { ShareButton } from "@/components/ShareButton";
+import { ShareSnippet } from "@/components/ShareSnippet";
 import { SignupForm } from "@/components/SignupForm";
 import { JsonLd } from "@/components/JsonLd";
 import { mdxComponents } from "@/components/mdx/mdx-components";
 import {
   getAdjacentIssues,
+  getAllTrends,
   getIssueMeta,
   getIssueSlugs,
   getIssueSource,
+  isPremium,
 } from "@/lib/mdx";
+import { remarkAutolinkTrends } from "@/lib/remark-autolink-trends";
 import { formatDateTR, issueNo } from "@/lib/format";
 import { articleSchema } from "@/lib/jsonld";
+import { siteConfig } from "@/lib/site";
 
 export const dynamicParams = false;
 
@@ -34,21 +43,26 @@ export async function generateMetadata({
   const { slug } = await params;
   if (!getIssueSlugs().includes(slug)) return {};
   const meta = getIssueMeta(slug);
+  // Premium issues expose only a teaser description (avoid leaking the body to
+  // search engines while the on-page content is gated).
+  const description = isPremium(slug)
+    ? `${meta.excerpt.split(" ").slice(0, 16).join(" ")}… (Pro abonelere özel)`
+    : meta.excerpt;
   return {
     title: meta.title,
-    description: meta.excerpt,
+    description,
     alternates: { canonical: `/arsiv/${slug}` },
     openGraph: {
       type: "article",
       title: meta.title,
-      description: meta.excerpt,
+      description,
       url: `/arsiv/${slug}`,
       publishedTime: meta.date,
     },
     twitter: {
       card: "summary_large_image",
       title: meta.title,
-      description: meta.excerpt,
+      description,
     },
   };
 }
@@ -63,13 +77,31 @@ export default async function IssuePage({
 
   const meta = getIssueMeta(slug);
   const { older, newer } = getAdjacentIssues(slug);
+  const premium = isPremium(slug);
+
+  const shareUrl = `${siteConfig.url}/arsiv/${slug}`;
+  const shareLines = [`"${meta.title}" — dünyada işliyor, Türkiye'de henüz yok.`];
+  if (meta.trends.length)
+    shareLines.push(`Bu sayıda: ${meta.trends.join(" · ")} 🇹🇷`);
+  shareLines.push(`→ ${shareUrl}`, "#TrendÇevir #Girişim");
+  const shareSnippet = shareLines.join("\n");
+
+  // Link the first prose mention of any known trend to its /trend/[slug] hub.
+  // The custom <Trend> blocks are skipped by the plugin, so only narrative
+  // text (e.g. the wrap-up paragraph) is touched.
+  const trendRefs = getAllTrends().map((t) => ({ name: t.name, slug: t.slug }));
 
   const { content } = await compileMDX({
     source: getIssueSource(slug),
     components: mdxComponents,
     options: {
       parseFrontmatter: true,
-      mdxOptions: { remarkPlugins: [remarkGfm] },
+      mdxOptions: {
+        remarkPlugins: [
+          remarkGfm,
+          [remarkAutolinkTrends, { trends: trendRefs }],
+        ],
+      },
     },
   });
 
@@ -88,10 +120,13 @@ export default async function IssuePage({
         </Link>
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-wider text-secondary">
-            {issueNo(meta.issue)} · {formatDateTR(meta.date)} ·{" "}
-            {meta.readingMinutes} dakika okuma
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <PremiumBadge premium={premium} />
+            <p className="font-mono text-xs uppercase tracking-wider text-secondary">
+              {issueNo(meta.issue)} · {formatDateTR(meta.date)} ·{" "}
+              {meta.readingMinutes} dakika okuma
+            </p>
+          </div>
           <ShareButton title={meta.title} slug={slug} />
         </div>
 
@@ -118,12 +153,35 @@ export default async function IssuePage({
           </div>
         </CoverArt>
 
-        <div className="mt-12">{content}</div>
+        <IssueSummary
+          excerpt={meta.excerpt}
+          trends={meta.trends}
+          readingMinutes={meta.readingMinutes}
+        />
 
-        <div className="gold-rule my-12" />
-        <p className="font-serif text-xl italic text-secondary">
-          — TrendÇevir Yazı İşleri
-        </p>
+        {premium ? (
+          <div className="relative mt-12">
+            <div className="max-h-[26rem] overflow-hidden [mask-image:linear-gradient(to_bottom,black_40%,transparent)]">
+              {content}
+            </div>
+            <div className="mt-6">
+              <PremiumGate proUrl={siteConfig.proUrl} />
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="mt-12">{content}</div>
+
+            <div className="gold-rule my-12" />
+            <p className="font-serif text-xl italic text-secondary">
+              — TrendÇevir Yazı İşleri
+            </p>
+          </>
+        )}
+
+        <ShareSnippet snippet={shareSnippet} slug={slug} />
+
+        <AppliedStories stories={meta.stories} />
 
         {/* Signup CTA */}
         <div className="mt-12 rounded-2xl border border-border bg-surface p-8 text-center md:p-10">

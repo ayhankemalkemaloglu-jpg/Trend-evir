@@ -32,6 +32,7 @@ Komutlar:
 | `pnpm build`  | Production derlemesi              |
 | `pnpm start`  | Derlenmiş çıktıyı sunar           |
 | `pnpm lint`   | ESLint                            |
+| `pnpm test`   | Vitest birim testleri             |
 
 ## Ortam değişkenleri
 
@@ -46,8 +47,20 @@ Tümü opsiyoneldir; tanımlı değilse ilgili özellik zarifçe devre dışı k
 | `RESEND_API_KEY`                | İletişim formu e-postaları için Resend anahtarı                |
 | `CONTACT_TO`                    | İletişim mesajlarının gideceği adres                           |
 | `CONTACT_FROM`                  | Doğrulanmış Resend gönderen, örn. `TrendÇevir <site@...>`      |
+| `ANTHROPIC_API_KEY`             | AI Fikir Üretici (`/fikir-uretici`) ve haftalık taslak otomasyonu |
+| `ANTHROPIC_IDEAS_MODEL`         | Fikir Üretici için opsiyonel model (varsayılan: hızlı bir Haiku) |
 
-Otomasyon hattı için (aşağıya bakın): `ANTHROPIC_API_KEY`.
+`ANTHROPIC_API_KEY` tanımsızsa `/api/generate-ideas` "yapılandırılmadı"
+mesajı döner; site geri kalanı normal çalışır.
+
+### Haftalık özet e-postası (opsiyonel)
+
+Bir bülten `main`'e düştüğünde `.github/workflows/notify-new-issue.yml`,
+`scripts/send-weekly-summary.mjs` ile kısa bir "bu hafta ne var?" özetini
+**Resend** üzerinden `WEEKLY_SUMMARY_TO` adresine gönderir (asıl bülten yine
+beehiiv'den gider; bu hafif bir hatırlatmadır). Secret'lar yoksa script dry-run
+yapar ve workflow başarısız olmaz. İlgili değişkenler: `RESEND_API_KEY`,
+`CONTACT_FROM`, `WEEKLY_SUMMARY_TO`, opsiyonel `SITE_URL`.
 
 ## İçerik: yeni bülten ekleme
 

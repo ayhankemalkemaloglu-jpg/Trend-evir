@@ -48,3 +48,27 @@ export function articleSchema(meta: IssueMeta) {
     mainEntityOfPage: `${siteConfig.url}/arsiv/${meta.slug}`,
   };
 }
+
+/** Article schema for a trend page — author is the editorial team, never a person. */
+export function trendSchema(trend: {
+  name: string;
+  description: string;
+  slug: string;
+  date?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: trend.name,
+    description: trend.description,
+    ...(trend.date ? { datePublished: trend.date } : {}),
+    inLanguage: "tr-TR",
+    author: { "@type": "Organization", name: "TrendÇevir Yazı İşleri" },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+    mainEntityOfPage: `${siteConfig.url}/trend/${trend.slug}`,
+  };
+}

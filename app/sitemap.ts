@@ -1,10 +1,18 @@
 import type { MetadataRoute } from "next";
-import { getAllIssues } from "@/lib/mdx";
+import { getAllIssues, getAllTrends } from "@/lib/mdx";
 import { siteConfig } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const pages = ["", "/arsiv", "/hakkinda", "/gizlilik", "/iletisim"].map(
+  const pages = [
+    "",
+    "/trend",
+    "/fikir-uretici",
+    "/arsiv",
+    "/hakkinda",
+    "/gizlilik",
+    "/iletisim",
+  ].map(
     (path) => ({
       url: `${siteConfig.url}${path}`,
       lastModified: now,
@@ -20,5 +28,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...pages, ...issues];
+  const trends = getAllTrends().map((trend) => ({
+    url: `${siteConfig.url}/trend/${trend.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  return [...pages, ...issues, ...trends];
 }

@@ -12,6 +12,13 @@ trends:
   - "Sleep Tourism Otelleri"
   - "Blind Box Vending"
   - "Fonksiyonel Su Barları"
+stories:
+  - city: "İzmir"
+    sector: "Perakende"
+    result: "Bir AVM'de tek blind box otomatıyla başladık; ilk ayın sonunda kurulum maliyetini çıkardık, ikinci otomatı koyduk."
+  - city: "İstanbul"
+    sector: "Yeme-İçme"
+    result: "Spor salonu yakınında küçük bir fonksiyonel içecek kiosku açtık. Hafta içi öğleden sonraları beklediğimizden yoğun."
 ---
 
 İlk sayımıza hoş geldin. Bu hafta üç trendi masaya yatırdık: ikisi yeni bir tüketim alışkanlığından besleniyor, biri ise sıkıcı görünen bir kategoriyi yeniden icat ediyor. Üçünü de aynı süzgeçten geçirdik — yurtdışında kanıt var mı, Türkiye'de boşluk var mı, makul bir sermayeyle başlanabilir mi.
@@ -48,7 +55,12 @@ Türkiye'de "uyku oteli" konsepti neredeyse yok; spa ve termal var ama uyku tek 
 
 </RiskFlags>
 
-<Trend name="Blind Box Vending" country="Çin" countryCode="CN" score={8} category="Perakende">
+<Trend name="Blind Box Vending" country="Çin" countryCode="CN" score={8} category="Perakende" scoreBreakdown={{
+  demand: { value: 9, note: "Koleksiyon kültürü güçlü; sürpriz mekaniği tekrar alımı besliyor." },
+  competition: 3,
+  regulation: { value: 6, note: "Şans unsuru içeren ürünlerde tüketici koruma kuralları netleştirilmeli." },
+  cost: 7,
+}}>
 
 İçinde ne çıkacağını bilmediğin **sürpriz kutu** otomatları. Koleksiyon figürleri, çıkartmalar, küçük oyuncaklar; sürprizin kendisi ürün. Pop Mart bu modeli dünya çapında milyarlarca dolarlık bir işe çevirdi.
 
@@ -79,6 +91,17 @@ Türkiye'de koleksiyon kültürü güçlü ama yerli bir blind box markası ve o
 - Stok ve nadirlik dengesi yanlış kurulursa ya heyecan ölür ya da güven zedelenir.
 
 </RiskFlags>
+
+<ActionPlan title="Blind Box otomatı pilotu" budget="150.000–400.000 ₺" timeline="6–8 hafta" difficulty="Orta">
+
+- İlk 7 gün: 2–3 AVM ile otomat yerleşimi için ön görüşme yap, metrekare ve komisyon koşullarını netleştir.
+- Yerli bir illüstratör ya da tasarımcıyla 6–8 figürlük ilk seriyi sözleşmeye bağla.
+- Küçük adetli (500–1.000) bir üretim için tedarikçiden numune al, kalite ve maliyet testini geç.
+- Tek otomatla tek lokasyonda pilot başlat; haftalık satışı ve tekrar alım oranını ölç.
+- Bir sosyal mekanik ekle: seri tamamlama kartı veya QR ile koleksiyon takibi.
+- 4 hafta sonra birim ekonomisini (ciro − kira − üretim) çıkar; pozitifse ikinci lokasyona geç.
+
+</ActionPlan>
 
 <Trend name="Fonksiyonel Su Barları" country="ABD" countryCode="US" score={6} category="Yeme-İçme">
 

@@ -1,4 +1,9 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { SignupForm } from "@/components/SignupForm";
+import { getAllTrends } from "@/lib/mdx";
 import { siteConfig } from "@/lib/site";
 
 function Stat({ value, label }: { value: string; label: string }) {
@@ -17,8 +22,13 @@ function Stat({ value, label }: { value: string; label: string }) {
  * the LCP element — paints immediately rather than after JS hydration.
  */
 export function Hero() {
+  const topTrend = getAllTrends()[0];
+
   return (
     <section className="relative overflow-hidden">
+      {/* animated shader backdrop (lazy, client-only, motion-aware) */}
+      <HeroBackdrop />
+
       {/* ambient glow */}
       <div
         aria-hidden
@@ -29,7 +39,18 @@ export function Hero() {
         }}
       />
 
-      <div className="container-px mx-auto max-w-5xl pb-20 pt-16 text-center md:pb-28 md:pt-24">
+      {/* Readability mask — darkens the centre so the headline stays legible
+          over the moving shader; edges stay clear so the colour shows. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 50%, transparent 100%)",
+        }}
+      />
+
+      <div className="relative z-20 container-px mx-auto max-w-5xl pb-20 pt-16 text-center md:pb-28 md:pt-24">
         <p className="kicker">Her Pazartesi · 09:00</p>
 
         <h1 className="mx-auto mt-6 max-w-4xl text-balance font-serif leading-[1.02] tracking-tight text-[clamp(3rem,8vw,6rem)]">
@@ -44,8 +65,15 @@ export function Hero() {
         </p>
 
         <div id="bulten" className="mx-auto mt-10 max-w-xl scroll-mt-28">
-          <SignupForm source="hero" />
-          <p className="mt-3 text-sm text-secondary">
+          <SignupForm
+            source="hero"
+            buttonLabel="Her Pazartesi 3 iş fikri al"
+            glass
+          />
+          <p className="mt-4 font-mono text-xs uppercase tracking-wider text-secondary">
+            3 dakika okuma · Türkiye uyum skoru · Aksiyon planı
+          </p>
+          <p className="mt-2 text-sm text-secondary">
             <span className="font-mono text-accent tabular">
               {siteConfig.subscriberCount}
             </span>{" "}
@@ -70,6 +98,22 @@ export function Hero() {
             label="haftalık açılma oranı"
           />
         </div>
+
+        {topTrend && (
+          <Link
+            href={`/trend/${topTrend.slug}`}
+            className="group mx-auto mt-10 inline-flex items-center gap-2.5 rounded-full border border-border bg-surface/60 px-4 py-2 text-sm transition-colors hover:border-accent/50"
+          >
+            <span className="font-mono text-[0.7rem] uppercase tracking-wider text-secondary">
+              Son sayıdan
+            </span>
+            <span className="text-foreground/90">{topTrend.name}</span>
+            <span className="font-mono font-semibold tabular text-accent">
+              {topTrend.score}/10
+            </span>
+            <ArrowRight className="size-4 text-secondary transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+          </Link>
+        )}
       </div>
 
       <div className="container-px mx-auto max-w-6xl">

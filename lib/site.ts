@@ -15,6 +15,9 @@ export const siteConfig = {
   description:
     "Her Pazartesi sabah, yurtdışında çalışan iş trendlerini Türk girişimcilere getiriyoruz. Üç dakikalık okuma, milyon dolarlık fikirler.",
   contactEmail: "iletisim@trendcevir.com",
+  // beehiiv paid-tier upgrade page (where the premium "Pro'ya Geç" CTA points).
+  // Placeholder — swap with the live beehiiv upgrade URL.
+  proUrl: "https://trendcevir.beehiiv.com/upgrade",
   // Placeholder — swap with the live beehiiv subscriber count.
   subscriberCount: 847,
   social: {
@@ -32,14 +35,17 @@ export const siteConfig = {
 export type NavLink = { label: string; href: string };
 
 export const navLinks: NavLink[] = [
-  { label: "Bülten", href: "/#bulten" },
+  { label: "Trendler", href: "/trend" },
+  { label: "Fikir Üretici", href: "/fikir-uretici" },
   { label: "Arşiv", href: "/arsiv" },
   { label: "Hakkında", href: "/hakkinda" },
 ];
 
 export const footerLinks: NavLink[] = [
-  { label: "Hakkında", href: "/hakkinda" },
+  { label: "Trendler", href: "/trend" },
+  { label: "Fikir Üretici", href: "/fikir-uretici" },
   { label: "Arşiv", href: "/arsiv" },
+  { label: "Hakkında", href: "/hakkinda" },
   { label: "Gizlilik", href: "/gizlilik" },
   { label: "İletişim", href: "/iletisim" },
 ];
