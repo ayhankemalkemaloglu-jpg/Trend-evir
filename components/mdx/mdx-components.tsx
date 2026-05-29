@@ -3,6 +3,7 @@ import { AlertTriangle } from "lucide-react";
 
 import { ActionPlan } from "@/components/mdx/ActionPlan";
 import { Flag } from "@/components/Flag";
+import { PersonalScore } from "@/components/trend/PersonalScore";
 import {
   ScoreBreakdown,
   weightedScore,
@@ -55,7 +56,12 @@ function Trend({
           {children}
         </div>
       )}
-      {scoreBreakdown && <ScoreBreakdown data={scoreBreakdown} />}
+      {scoreBreakdown && (
+        <>
+          <ScoreBreakdown data={scoreBreakdown} />
+          <PersonalScore data={scoreBreakdown} baseScore={displayScore} />
+        </>
+      )}
     </section>
   );
 }
