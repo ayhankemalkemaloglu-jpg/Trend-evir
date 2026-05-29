@@ -4,7 +4,15 @@ import { siteConfig } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const pages = ["", "/trend", "/arsiv", "/hakkinda", "/gizlilik", "/iletisim"].map(
+  const pages = [
+    "",
+    "/trend",
+    "/fikir-uretici",
+    "/arsiv",
+    "/hakkinda",
+    "/gizlilik",
+    "/iletisim",
+  ].map(
     (path) => ({
       url: `${siteConfig.url}${path}`,
       lastModified: now,

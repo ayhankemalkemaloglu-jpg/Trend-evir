@@ -46,8 +46,11 @@ Tümü opsiyoneldir; tanımlı değilse ilgili özellik zarifçe devre dışı k
 | `RESEND_API_KEY`                | İletişim formu e-postaları için Resend anahtarı                |
 | `CONTACT_TO`                    | İletişim mesajlarının gideceği adres                           |
 | `CONTACT_FROM`                  | Doğrulanmış Resend gönderen, örn. `TrendÇevir <site@...>`      |
+| `ANTHROPIC_API_KEY`             | AI Fikir Üretici (`/fikir-uretici`) ve haftalık taslak otomasyonu |
+| `ANTHROPIC_IDEAS_MODEL`         | Fikir Üretici için opsiyonel model (varsayılan: hızlı bir Haiku) |
 
-Otomasyon hattı için (aşağıya bakın): `ANTHROPIC_API_KEY`.
+`ANTHROPIC_API_KEY` tanımsızsa `/api/generate-ideas` "yapılandırılmadı"
+mesajı döner; site geri kalanı normal çalışır.
 
 ## İçerik: yeni bülten ekleme
 

@@ -32,14 +32,15 @@ export const siteConfig = {
 export type NavLink = { label: string; href: string };
 
 export const navLinks: NavLink[] = [
-  { label: "Bülten", href: "/#bulten" },
   { label: "Trendler", href: "/trend" },
+  { label: "Fikir Üretici", href: "/fikir-uretici" },
   { label: "Arşiv", href: "/arsiv" },
   { label: "Hakkında", href: "/hakkinda" },
 ];
 
 export const footerLinks: NavLink[] = [
   { label: "Trendler", href: "/trend" },
+  { label: "Fikir Üretici", href: "/fikir-uretici" },
   { label: "Arşiv", href: "/arsiv" },
   { label: "Hakkında", href: "/hakkinda" },
   { label: "Gizlilik", href: "/gizlilik" },
