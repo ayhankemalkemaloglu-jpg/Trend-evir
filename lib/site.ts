@@ -15,6 +15,9 @@ export const siteConfig = {
   description:
     "Her Pazartesi sabah, yurtdışında çalışan iş trendlerini Türk girişimcilere getiriyoruz. Üç dakikalık okuma, milyon dolarlık fikirler.",
   contactEmail: "iletisim@trendcevir.com",
+  // beehiiv paid-tier upgrade page (where the premium "Pro'ya Geç" CTA points).
+  // Placeholder — swap with the live beehiiv upgrade URL.
+  proUrl: "https://trendcevir.beehiiv.com/upgrade",
   // Placeholder — swap with the live beehiiv subscriber count.
   subscriberCount: 847,
   social: {

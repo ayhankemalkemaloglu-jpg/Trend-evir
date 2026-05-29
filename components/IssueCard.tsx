@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CoverArt } from "@/components/CoverArt";
+import { PremiumBadge } from "@/components/PremiumBadge";
 import { formatDateTR, issueNo } from "@/lib/format";
 import type { IssueMeta } from "@/lib/mdx";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,9 @@ export function IssueCard({
           <span className="rounded-full bg-background/55 px-3 py-1 font-mono text-xs text-accent backdrop-blur-sm">
             {issueNo(issue.issue)}
           </span>
+        </div>
+        <div className="absolute right-4 top-4">
+          <PremiumBadge premium={issue.premium} className="bg-background/55 backdrop-blur-sm" />
         </div>
       </CoverArt>
 

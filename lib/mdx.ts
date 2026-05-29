@@ -19,6 +19,8 @@ export type IssueMeta = {
   trends: string[];
   readingMinutes: number;
   stories: IssueStory[];
+  /** Pro-only (older than the newest FREE_ISSUE_COUNT issues). */
+  premium: boolean;
 };
 
 function parseStories(input: unknown): IssueStory[] {
@@ -47,7 +49,7 @@ export function getIssueSource(slug: string): string {
   return fs.readFileSync(path.join(ISSUES_DIR, `${slug}.mdx`), "utf8");
 }
 
-export function getIssueMeta(slug: string): IssueMeta {
+function buildMeta(slug: string): Omit<IssueMeta, "premium"> {
   const { data, content } = matter(getIssueSource(slug));
   return {
     slug,
@@ -64,13 +66,36 @@ export function getIssueMeta(slug: string): IssueMeta {
 }
 
 export function getAllIssues(): IssueMeta[] {
+  // Newest first; the first FREE_ISSUE_COUNT stay free, the rest are Pro.
   return getIssueSlugs()
-    .map(getIssueMeta)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .map(buildMeta)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .map((meta, i) => ({ ...meta, premium: i >= FREE_ISSUE_COUNT }));
+}
+
+export function getIssueMeta(slug: string): IssueMeta {
+  const found = getAllIssues().find((m) => m.slug === slug);
+  return found ?? { ...buildMeta(slug), premium: false };
 }
 
 export function getLatestIssue(): IssueMeta | undefined {
   return getAllIssues()[0];
+}
+
+/** The most recent issues stay free; older ones are Pro. */
+export const FREE_ISSUE_COUNT = 2;
+
+/**
+ * Whether an issue is Pro-only. Based on recency (the newest FREE_ISSUE_COUNT
+ * issues by date are free) to match how the rest of the site orders issues and
+ * the "son 2 sayı ücretsiz" intent. To gate by issue number instead, compare
+ * `getIssueMeta(slug).issue` against the max issue number.
+ */
+export function isPremium(slug: string): boolean {
+  const freeSlugs = getAllIssues()
+    .slice(0, FREE_ISSUE_COUNT)
+    .map((i) => i.slug);
+  return !freeSlugs.includes(slug);
 }
 
 /** Older issue = "Önceki Bülten", newer issue = "Sonraki Bülten". */

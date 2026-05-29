@@ -8,6 +8,8 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { CoverArt } from "@/components/CoverArt";
 import { AppliedStories } from "@/components/AppliedStories";
 import { IssueSummary } from "@/components/IssueSummary";
+import { PremiumBadge } from "@/components/PremiumBadge";
+import { PremiumGate } from "@/components/PremiumGate";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { ShareButton } from "@/components/ShareButton";
 import { ShareSnippet } from "@/components/ShareSnippet";
@@ -20,6 +22,7 @@ import {
   getIssueMeta,
   getIssueSlugs,
   getIssueSource,
+  isPremium,
 } from "@/lib/mdx";
 import { remarkAutolinkTrends } from "@/lib/remark-autolink-trends";
 import { formatDateTR, issueNo } from "@/lib/format";
@@ -40,21 +43,26 @@ export async function generateMetadata({
   const { slug } = await params;
   if (!getIssueSlugs().includes(slug)) return {};
   const meta = getIssueMeta(slug);
+  // Premium issues expose only a teaser description (avoid leaking the body to
+  // search engines while the on-page content is gated).
+  const description = isPremium(slug)
+    ? `${meta.excerpt.split(" ").slice(0, 16).join(" ")}… (Pro abonelere özel)`
+    : meta.excerpt;
   return {
     title: meta.title,
-    description: meta.excerpt,
+    description,
     alternates: { canonical: `/arsiv/${slug}` },
     openGraph: {
       type: "article",
       title: meta.title,
-      description: meta.excerpt,
+      description,
       url: `/arsiv/${slug}`,
       publishedTime: meta.date,
     },
     twitter: {
       card: "summary_large_image",
       title: meta.title,
-      description: meta.excerpt,
+      description,
     },
   };
 }
@@ -69,6 +77,7 @@ export default async function IssuePage({
 
   const meta = getIssueMeta(slug);
   const { older, newer } = getAdjacentIssues(slug);
+  const premium = isPremium(slug);
 
   const shareUrl = `${siteConfig.url}/arsiv/${slug}`;
   const shareLines = [`"${meta.title}" — dünyada işliyor, Türkiye'de henüz yok.`];
@@ -111,10 +120,13 @@ export default async function IssuePage({
         </Link>
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-wider text-secondary">
-            {issueNo(meta.issue)} · {formatDateTR(meta.date)} ·{" "}
-            {meta.readingMinutes} dakika okuma
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <PremiumBadge premium={premium} />
+            <p className="font-mono text-xs uppercase tracking-wider text-secondary">
+              {issueNo(meta.issue)} · {formatDateTR(meta.date)} ·{" "}
+              {meta.readingMinutes} dakika okuma
+            </p>
+          </div>
           <ShareButton title={meta.title} slug={slug} />
         </div>
 
@@ -147,12 +159,25 @@ export default async function IssuePage({
           readingMinutes={meta.readingMinutes}
         />
 
-        <div className="mt-12">{content}</div>
+        {premium ? (
+          <div className="relative mt-12">
+            <div className="max-h-[26rem] overflow-hidden [mask-image:linear-gradient(to_bottom,black_40%,transparent)]">
+              {content}
+            </div>
+            <div className="mt-6">
+              <PremiumGate proUrl={siteConfig.proUrl} />
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="mt-12">{content}</div>
 
-        <div className="gold-rule my-12" />
-        <p className="font-serif text-xl italic text-secondary">
-          — TrendÇevir Yazı İşleri
-        </p>
+            <div className="gold-rule my-12" />
+            <p className="font-serif text-xl italic text-secondary">
+              — TrendÇevir Yazı İşleri
+            </p>
+          </>
+        )}
 
         <ShareSnippet snippet={shareSnippet} slug={slug} />
 
