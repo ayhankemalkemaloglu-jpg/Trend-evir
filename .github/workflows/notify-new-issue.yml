@@ -1,0 +1,34 @@
+name: Yeni sayı bildirimi
+
+# Bir bülten main'e düştüğünde (PR merge) kısa bir "bu hafta ne var?" özetini
+# Resend ile gönderir. Asıl bülten beehiiv'den gider; bu, yapılandırılmış bir
+# adrese giden hafif bir özettir. Gerekli secret'lar yoksa script dry-run yapar.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "content/issues/**"
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Haftalık özeti gönder
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          CONTACT_FROM: ${{ secrets.CONTACT_FROM }}
+          WEEKLY_SUMMARY_TO: ${{ secrets.WEEKLY_SUMMARY_TO }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: node scripts/send-weekly-summary.mjs

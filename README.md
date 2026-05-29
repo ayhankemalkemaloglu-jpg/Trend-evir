@@ -52,6 +52,15 @@ Tümü opsiyoneldir; tanımlı değilse ilgili özellik zarifçe devre dışı k
 `ANTHROPIC_API_KEY` tanımsızsa `/api/generate-ideas` "yapılandırılmadı"
 mesajı döner; site geri kalanı normal çalışır.
 
+### Haftalık özet e-postası (opsiyonel)
+
+Bir bülten `main`'e düştüğünde `.github/workflows/notify-new-issue.yml`,
+`scripts/send-weekly-summary.mjs` ile kısa bir "bu hafta ne var?" özetini
+**Resend** üzerinden `WEEKLY_SUMMARY_TO` adresine gönderir (asıl bülten yine
+beehiiv'den gider; bu hafif bir hatırlatmadır). Secret'lar yoksa script dry-run
+yapar ve workflow başarısız olmaz. İlgili değişkenler: `RESEND_API_KEY`,
+`CONTACT_FROM`, `WEEKLY_SUMMARY_TO`, opsiyonel `SITE_URL`.
+
 ## İçerik: yeni bülten ekleme
 
 Her bülten `content/issues/NNN-slug.mdx` biçiminde bir dosyadır. Frontmatter:
