@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { CoverArt } from "@/components/CoverArt";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { ShareButton } from "@/components/ShareButton";
+import { ShareSnippet } from "@/components/ShareSnippet";
 import { SignupForm } from "@/components/SignupForm";
 import { JsonLd } from "@/components/JsonLd";
 import { mdxComponents } from "@/components/mdx/mdx-components";
@@ -19,6 +20,7 @@ import {
 } from "@/lib/mdx";
 import { formatDateTR, issueNo } from "@/lib/format";
 import { articleSchema } from "@/lib/jsonld";
+import { siteConfig } from "@/lib/site";
 
 export const dynamicParams = false;
 
@@ -63,6 +65,13 @@ export default async function IssuePage({
 
   const meta = getIssueMeta(slug);
   const { older, newer } = getAdjacentIssues(slug);
+
+  const shareUrl = `${siteConfig.url}/arsiv/${slug}`;
+  const shareLines = [`"${meta.title}" — dünyada işliyor, Türkiye'de henüz yok.`];
+  if (meta.trends.length)
+    shareLines.push(`Bu sayıda: ${meta.trends.join(" · ")} 🇹🇷`);
+  shareLines.push(`→ ${shareUrl}`, "#TrendÇevir #Girişim");
+  const shareSnippet = shareLines.join("\n");
 
   const { content } = await compileMDX({
     source: getIssueSource(slug),
@@ -124,6 +133,8 @@ export default async function IssuePage({
         <p className="font-serif text-xl italic text-secondary">
           — TrendÇevir Yazı İşleri
         </p>
+
+        <ShareSnippet snippet={shareSnippet} slug={slug} />
 
         {/* Signup CTA */}
         <div className="mt-12 rounded-2xl border border-border bg-surface p-8 text-center md:p-10">
