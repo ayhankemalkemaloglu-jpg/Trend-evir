@@ -67,3 +67,108 @@ export function getAdjacentIssues(slug: string): {
     older: i < all.length - 1 ? all[i + 1] : undefined,
   };
 }
+
+/* --------------------------------- trends --------------------------------- */
+
+/** Turkish-aware slug for a trend name (mirrors scripts/generate-issue.mjs). */
+export function trendSlug(name: string): string {
+  const map: Record<string, string> = {
+    ç: "c",
+    ğ: "g",
+    ı: "i",
+    İ: "i",
+    ö: "o",
+    ş: "s",
+    ü: "u",
+  };
+  return name
+    .toLowerCase()
+    .replace(/[çğıİöşü]/g, (c) => map[c] ?? c)
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+}
+
+export type TrendEntry = {
+  slug: string;
+  name: string;
+  country: string;
+  countryCode: string;
+  category: string;
+  score: number;
+  description: string;
+  /** Issues that cover this trend, newest first. */
+  issues: IssueMeta[];
+};
+
+const TREND_BLOCK_RE = /<Trend\b([^>]*?)>([\s\S]*?)<\/Trend>/g;
+
+function strAttr(raw: string, name: string): string | undefined {
+  return raw.match(new RegExp(`${name}\\s*=\\s*"([^"]*)"`))?.[1];
+}
+
+function numAttr(raw: string, name: string): number | undefined {
+  const m = raw.match(
+    new RegExp(`${name}\\s*=\\s*\\{?\\s*"?(\\d+(?:\\.\\d+)?)"?\\s*\\}?`),
+  );
+  return m ? Number(m[1]) : undefined;
+}
+
+function cleanIntro(body: string, max = 300): string {
+  const text = body
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/[*_`]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+}
+
+/**
+ * Builds the trend index by parsing <Trend> blocks out of every issue body.
+ * The newest mention wins for a trend's metadata; sorted by score, high first.
+ */
+export function getAllTrends(): TrendEntry[] {
+  const byslug = new Map<string, TrendEntry>();
+
+  for (const issue of getAllIssues()) {
+    // getAllIssues is newest first, so the first mention we see is the newest.
+    const body = matter(getIssueSource(issue.slug)).content;
+    for (const match of body.matchAll(TREND_BLOCK_RE)) {
+      const attrs = match[1];
+      const name = strAttr(attrs, "name");
+      if (!name) continue;
+      const slug = trendSlug(name);
+
+      const existing = byslug.get(slug);
+      if (existing) {
+        existing.issues.push(issue);
+        continue;
+      }
+      byslug.set(slug, {
+        slug,
+        name,
+        country: strAttr(attrs, "country") ?? "",
+        countryCode: strAttr(attrs, "countryCode") ?? "",
+        category: strAttr(attrs, "category") ?? "",
+        score: numAttr(attrs, "score") ?? 0,
+        description: cleanIntro(match[2] ?? ""),
+        issues: [issue],
+      });
+    }
+  }
+
+  return [...byslug.values()].sort((a, b) => b.score - a.score);
+}
+
+export function getTrendSlugs(): string[] {
+  return getAllTrends().map((t) => t.slug);
+}
+
+export function getTrendBySlug(slug: string): TrendEntry | undefined {
+  return getAllTrends().find((t) => t.slug === slug);
+}

@@ -33,13 +33,15 @@ export type NavLink = { label: string; href: string };
 
 export const navLinks: NavLink[] = [
   { label: "Bülten", href: "/#bulten" },
+  { label: "Trendler", href: "/trend" },
   { label: "Arşiv", href: "/arsiv" },
   { label: "Hakkında", href: "/hakkinda" },
 ];
 
 export const footerLinks: NavLink[] = [
-  { label: "Hakkında", href: "/hakkinda" },
+  { label: "Trendler", href: "/trend" },
   { label: "Arşiv", href: "/arsiv" },
+  { label: "Hakkında", href: "/hakkinda" },
   { label: "Gizlilik", href: "/gizlilik" },
   { label: "İletişim", href: "/iletisim" },
 ];
