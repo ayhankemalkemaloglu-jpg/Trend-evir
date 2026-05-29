@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { CoverArt } from "@/components/CoverArt";
+import { AppliedStories } from "@/components/AppliedStories";
 import { IssueSummary } from "@/components/IssueSummary";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { ShareButton } from "@/components/ShareButton";
@@ -154,6 +155,8 @@ export default async function IssuePage({
         </p>
 
         <ShareSnippet snippet={shareSnippet} slug={slug} />
+
+        <AppliedStories stories={meta.stories} />
 
         {/* Signup CTA */}
         <div className="mt-12 rounded-2xl border border-border bg-surface p-8 text-center md:p-10">

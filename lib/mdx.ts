@@ -5,6 +5,9 @@ import readingTime from "reading-time";
 
 const ISSUES_DIR = path.join(process.cwd(), "content", "issues");
 
+/** Anonymous "I applied this" story — no founder names, by brand rule. */
+export type IssueStory = { city: string; sector: string; result: string };
+
 export type IssueMeta = {
   slug: string;
   issue: number;
@@ -15,7 +18,22 @@ export type IssueMeta = {
   categories: string[];
   trends: string[];
   readingMinutes: number;
+  stories: IssueStory[];
 };
+
+function parseStories(input: unknown): IssueStory[] {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map((s) => {
+      const o = (s ?? {}) as Record<string, unknown>;
+      return {
+        city: String(o.city ?? ""),
+        sector: String(o.sector ?? ""),
+        result: String(o.result ?? ""),
+      };
+    })
+    .filter((s) => s.result);
+}
 
 export function getIssueSlugs(): string[] {
   if (!fs.existsSync(ISSUES_DIR)) return [];
@@ -41,6 +59,7 @@ export function getIssueMeta(slug: string): IssueMeta {
     categories: Array.isArray(data.categories) ? data.categories.map(String) : [],
     trends: Array.isArray(data.trends) ? data.trends.map(String) : [],
     readingMinutes: Math.max(1, Math.round(readingTime(content).minutes)),
+    stories: parseStories(data.stories),
   };
 }
 
