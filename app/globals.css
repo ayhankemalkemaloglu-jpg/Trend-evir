@@ -138,3 +138,12 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Hero flowing-line accent: dashed gold strokes drift along their paths.
+   Each path's dash pattern length divides 1200, so the loop is seamless.
+   Frozen automatically by the reduced-motion rule above. */
+@keyframes trend-flow {
+  to {
+    stroke-dashoffset: -1200;
+  }
+}
