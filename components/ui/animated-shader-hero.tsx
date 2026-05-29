@@ -6,9 +6,13 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /* -------------------------------------------------------------------------- */
-/*  Brand-recoloured fragment shader (orig. nebula by @atzedent), gold on a    */
-/*  near-charcoal field instead of the warm RGB original. Raw WebGL2 — no      */
-/*  three.js dependency.                                                       */
+/*  Shadertoy-compatible WebGL2 harness.                                       */
+/*                                                                            */
+/*  Provides the iResolution / iTime / iMouse uniforms and the                 */
+/*  `void mainImage(out vec4 fragColor, in vec2 fragCoord)` entry point, so a   */
+/*  shader you have the rights to can be dropped into MAIN_IMAGE below. The     */
+/*  default mainImage here is original brand work (gold on charcoal) — it does  */
+/*  not reproduce any third-party Shadertoy shader.                            */
 /* -------------------------------------------------------------------------- */
 
 const VERTEX_SRC = `#version 300 es
@@ -16,38 +20,37 @@ precision highp float;
 in vec4 position;
 void main(){gl_Position=position;}`;
 
+// ── Paste a licensed Shadertoy `mainImage` between the markers to swap looks ──
+const MAIN_IMAGE = `
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+  vec2 R = iResolution.xy;
+  float mn = min(R.x, R.y);
+  vec2 uv = (fragCoord - 0.5 * R) / mn;
+  vec2 mouse = (iMouse.xy - 0.5 * R) / mn;
+  uv += mouse * 0.06;                 // gentle parallax toward the cursor
+  float t = iTime * 0.15;
+  vec3 gold = vec3(0.831, 0.686, 0.216);
+  vec3 col = vec3(0.0);
+  vec2 p = uv;
+  for (float i = 1.0; i < 10.0; i++) {
+    p += 0.12 * cos(i * vec2(0.11 + 0.02 * i, 0.8) + i * i + t + 0.1 * p.x);
+    float d = length(p);
+    col += 0.0014 / d * gold * (0.6 + 0.4 * sin(i + t));
+  }
+  float glow = 0.025 / (length(uv - mouse) + 0.10);
+  col += gold * glow * 0.12;
+  col = mix(vec3(0.02, 0.018, 0.009), col, 0.92); // charcoal base
+  fragColor = vec4(col, 1.0);
+}`;
+
 const FRAGMENT_SRC = `#version 300 es
 precision highp float;
-out vec4 O;
-uniform vec2 resolution;
-uniform float time;
-#define FC gl_FragCoord.xy
-#define T time
-#define R resolution
-#define MN min(R.x,R.y)
-float rnd(vec2 p){p=fract(p*vec2(12.9898,78.233));p+=dot(p,p+34.56);return fract(p.x*p.y);}
-float noise(in vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);float a=rnd(i),b=rnd(i+vec2(1,0)),c=rnd(i+vec2(0,1)),d=rnd(i+1.);return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
-float fbm(vec2 p){float t=.0,a=1.;mat2 m=mat2(1.,-.5,.2,1.2);for(int i=0;i<5;i++){t+=a*noise(p);p*=2.*m;a*=.5;}return t;}
-float clouds(vec2 p){float d=1.,t=.0;for(float i=.0;i<3.;i++){float a=d*fbm(i*10.+p.x*.2+.2*(1.+i)*p.y+d+i*i+p);t=mix(t,d,a);d=a;p*=2./(i+1.);}return t;}
-void main(void){
-  vec2 uv=(FC-.5*R)/MN,st=uv*vec2(2,1);
-  vec3 col=vec3(0);
-  float bg=clouds(vec2(st.x+T*.5,-st.y));
-  uv*=1.-.3*(sin(T*.2)*.5+.5);
-  // TrendÇevir gold (#d4af37) — single hue, kept subtle.
-  vec3 gold=vec3(.831,.686,.216);
-  for(float i=1.;i<12.;i++){
-    uv+=.1*cos(i*vec2(.1+.01*i,.8)+i*i+T*.5+.1*uv.x);
-    vec2 p=uv;
-    float d=length(p);
-    col+=.0012/d*gold*(.65+.35*sin(i));
-    float b=noise(i+p+bg*1.731);
-    col+=.0016*b/length(max(p,vec2(b*p.x*.02,p.y)))*gold;
-    // Dark, faintly warm charcoal background so it sits behind text.
-    col=mix(col,vec3(bg*.13,bg*.10,bg*.04),d);
-  }
-  O=vec4(col,1);
-}`;
+uniform vec3 iResolution;
+uniform float iTime;
+uniform vec4 iMouse;
+out vec4 _fragColor;
+${MAIN_IMAGE}
+void main(){ vec4 c; mainImage(c, gl_FragCoord.xy); _fragColor = c; }`;
 
 function compile(
   gl: WebGL2RenderingContext,
@@ -66,10 +69,11 @@ function compile(
 }
 
 /**
- * Animated gold-light shader that fills its positioned parent. Decorative
- * (aria-hidden). Degrades to nothing when WebGL2 is unavailable, renders a
- * single static frame under prefers-reduced-motion, and pauses when offscreen
- * or the tab is hidden. Pixel ratio is capped for performance.
+ * Full-bleed animated shader that fills its positioned parent. Decorative
+ * (aria-hidden). Supplies iResolution/iTime/iMouse, tracks the pointer for
+ * iMouse, caps devicePixelRatio for mobile performance, renders a single
+ * static frame under prefers-reduced-motion, pauses when offscreen or the tab
+ * is hidden, and degrades to nothing when WebGL2 is unavailable.
  */
 export function ShaderBackground({ className }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -104,8 +108,16 @@ export function ShaderBackground({ className }: { className?: string }) {
     gl.enableVertexAttribArray(position);
     gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
-    const uResolution = gl.getUniformLocation(program, "resolution");
-    const uTime = gl.getUniformLocation(program, "time");
+    const uResolution = gl.getUniformLocation(program, "iResolution");
+    const uTime = gl.getUniformLocation(program, "iTime");
+    const uMouse = gl.getUniformLocation(program, "iMouse");
+
+    // iMouse in drawing-buffer pixels (origin bottom-left, like gl_FragCoord).
+    const mouse = { x: 0, y: 0 };
+    function centreMouse() {
+      mouse.x = canvas!.width / 2;
+      mouse.y = canvas!.height / 2;
+    }
 
     function resize() {
       const w = Math.max(1, Math.floor(canvas!.clientWidth * dpr));
@@ -118,8 +130,9 @@ export function ShaderBackground({ className }: { className?: string }) {
     }
 
     function draw(now: number) {
-      gl!.uniform2f(uResolution, canvas!.width, canvas!.height);
+      gl!.uniform3f(uResolution, canvas!.width, canvas!.height, 1);
       gl!.uniform1f(uTime, now * 1e-3);
+      gl!.uniform4f(uMouse, mouse.x, mouse.y, 0, 0);
       gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
     }
 
@@ -138,7 +151,15 @@ export function ShaderBackground({ className }: { className?: string }) {
       }
     }
 
+    function onPointerMove(e: PointerEvent) {
+      const rect = canvas!.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      mouse.x = (e.clientX - rect.left) * dpr;
+      mouse.y = canvas!.height - (e.clientY - rect.top) * dpr;
+    }
+
     resize();
+    centreMouse();
     draw(0); // one static frame (also the reduced-motion result)
 
     const ro = new ResizeObserver(() => {
@@ -156,13 +177,17 @@ export function ShaderBackground({ className }: { className?: string }) {
     const onVisibility = () => (document.hidden ? stop() : play());
     document.addEventListener("visibilitychange", onVisibility);
 
-    play();
+    if (!reduce) {
+      window.addEventListener("pointermove", onPointerMove, { passive: true });
+      play();
+    }
 
     return () => {
       stop();
       ro.disconnect();
       io.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pointermove", onPointerMove);
       gl.deleteProgram(program);
       gl.deleteShader(vs);
       gl.deleteShader(fs);

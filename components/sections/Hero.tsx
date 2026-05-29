@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
-import { HeroLines } from "@/components/sections/HeroLines";
 import { SignupForm } from "@/components/SignupForm";
 import { getAllTrends } from "@/lib/mdx";
 import { siteConfig } from "@/lib/site";
@@ -27,10 +26,8 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden">
-      {/* animated gold-light backdrop (lazy, client-only, motion-aware) */}
+      {/* animated shader backdrop (lazy, client-only, motion-aware) */}
       <HeroBackdrop />
-      {/* flowing dashed gold lines (pure SVG/CSS, sits over the backdrop) */}
-      <HeroLines />
 
       {/* ambient glow */}
       <div
