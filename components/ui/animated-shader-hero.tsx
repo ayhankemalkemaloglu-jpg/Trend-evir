@@ -20,27 +20,37 @@ precision highp float;
 in vec4 position;
 void main(){gl_Position=position;}`;
 
-// ── Paste a licensed Shadertoy `mainImage` between the markers to swap looks ──
+// ── Shadertoy mainImage. Provided by the site owner; attribution kept below. ──
+// The only change from the source is zero-initialising i and z (the original
+// relies on Shadertoy zero-initialising locals; WebGL2 doesn't guarantee that).
 const MAIN_IMAGE = `
-void mainImage(out vec4 fragColor, in vec2 fragCoord){
-  vec2 R = iResolution.xy;
-  float mn = min(R.x, R.y);
-  vec2 uv = (fragCoord - 0.5 * R) / mn;
-  vec2 mouse = (iMouse.xy - 0.5 * R) / mn;
-  uv += mouse * 0.06;                 // gentle parallax toward the cursor
-  float t = iTime * 0.15;
-  vec3 gold = vec3(0.831, 0.686, 0.216);
-  vec3 col = vec3(0.0);
-  vec2 p = uv;
-  for (float i = 1.0; i < 10.0; i++) {
-    p += 0.12 * cos(i * vec2(0.11 + 0.02 * i, 0.8) + i * i + t + 0.1 * p.x);
-    float d = length(p);
-    col += 0.0014 / d * gold * (0.6 + 0.4 * sin(i + t));
-  }
-  float glow = 0.025 / (length(uv - mouse) + 0.10);
-  col += gold * glow * 0.12;
-  col = mix(vec3(0.02, 0.018, 0.009), col, 0.92); // charcoal base
-  fragColor = vec4(col, 1.0);
+/*
+    "Waveform" by @XorDev
+    https://www.shadertoy.com/view/Wcc3z2
+*/
+void mainImage(out vec4 O, vec2 I)
+{
+    //Raymarch iterator, step distance, depth and reflection
+    float i=0., d, z=0., r;
+    //Clear fragcolor and raymarch 90 steps
+    for(O*= i; i++<9e1;
+    //Pick color and attenuate
+    O += (cos(z*.5+iTime+vec4(0,2,4,3))+1.3)/d/z)
+    {
+        //Raymarch sample point
+        vec3 p = z * normalize(vec3(I+I,0) - iResolution.xyy);
+        //Shift camera and get reflection coordinates
+        r = max(-++p, 0.).y;
+        //Mirror
+        p.y += r+r;
+        //Sine waves
+        for(d=1.; d<3e1; d+=d)
+            p.y += cos(p*d+2.*iTime*cos(d)+z).x/d;
+        //Step forward (reflections are softer)
+        z += d = (.1*r+abs(p.y-1.)/ (1.+r+r+r*r) + max(d=p.z+3.,-d*.1))/8.;
+    }
+    //Tanh tonemapping
+    O = tanh(O/9e2);
 }`;
 
 const FRAGMENT_SRC = `#version 300 es
@@ -50,7 +60,7 @@ uniform float iTime;
 uniform vec4 iMouse;
 out vec4 _fragColor;
 ${MAIN_IMAGE}
-void main(){ vec4 c; mainImage(c, gl_FragCoord.xy); _fragColor = c; }`;
+void main(){ vec4 c = vec4(0.0); mainImage(c, gl_FragCoord.xy); _fragColor = c; }`;
 
 function compile(
   gl: WebGL2RenderingContext,
