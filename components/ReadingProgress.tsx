@@ -1,25 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { useScrollProgress } from "@/lib/use-scroll-progress";
 
 export function ReadingProgress({ slug }: { slug: string }) {
-  const [progress, setProgress] = useState(0);
+  const progress = useScrollProgress();
 
   useEffect(() => {
     trackEvent("issue_read", { slug });
   }, [slug]);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const el = document.documentElement;
-      const max = el.scrollHeight - el.clientHeight;
-      setProgress(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 0);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
     <div

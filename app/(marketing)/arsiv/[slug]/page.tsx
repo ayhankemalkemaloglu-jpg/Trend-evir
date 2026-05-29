@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { CoverArt } from "@/components/CoverArt";
+import { IssueSummary } from "@/components/IssueSummary";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { ShareButton } from "@/components/ShareButton";
 import { ShareSnippet } from "@/components/ShareSnippet";
@@ -126,6 +127,12 @@ export default async function IssuePage({
             ))}
           </div>
         </CoverArt>
+
+        <IssueSummary
+          excerpt={meta.excerpt}
+          trends={meta.trends}
+          readingMinutes={meta.readingMinutes}
+        />
 
         <div className="mt-12">{content}</div>
 
