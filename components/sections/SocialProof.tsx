@@ -1,15 +1,36 @@
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/sections/SectionHeading";
 import { testimonials, mediaMentions } from "@/lib/content";
+import { siteConfig } from "@/lib/site";
+
+const METRICS = [
+  { value: siteConfig.subscriberCount.toLocaleString("tr-TR"), label: "girişimci okuyor" },
+  { value: `%${siteConfig.stats.openRate}`, label: "her hafta açıyor" },
+  { value: String(siteConfig.stats.trends), label: "trend incelendi" },
+];
 
 export function SocialProof() {
   return (
     <section className="container-px mx-auto max-w-6xl py-20 md:py-28">
       <Reveal>
+        <dl className="mx-auto grid max-w-3xl grid-cols-1 gap-6 rounded-2xl border border-border bg-surface p-8 text-center sm:grid-cols-3">
+          {METRICS.map((m) => (
+            <div key={m.label}>
+              <dt className="font-serif text-4xl text-accent md:text-5xl">
+                {m.value}
+              </dt>
+              <dd className="mt-1.5 text-sm text-secondary">{m.label}</dd>
+            </div>
+          ))}
+        </dl>
+      </Reveal>
+
+      <Reveal>
         <SectionHeading
           kicker="Abonelerden"
           title="Girişimciler ne diyor?"
           align="center"
+          className="mt-20"
         />
       </Reveal>
 

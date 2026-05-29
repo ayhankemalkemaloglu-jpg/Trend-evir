@@ -1,5 +1,9 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { SignupForm } from "@/components/SignupForm";
+import { getAllTrends } from "@/lib/mdx";
 import { siteConfig } from "@/lib/site";
 
 function Stat({ value, label }: { value: string; label: string }) {
@@ -18,6 +22,8 @@ function Stat({ value, label }: { value: string; label: string }) {
  * the LCP element — paints immediately rather than after JS hydration.
  */
 export function Hero() {
+  const topTrend = getAllTrends()[0];
+
   return (
     <section className="relative overflow-hidden">
       {/* animated gold-light backdrop (lazy, client-only, motion-aware) */}
@@ -48,8 +54,11 @@ export function Hero() {
         </p>
 
         <div id="bulten" className="mx-auto mt-10 max-w-xl scroll-mt-28">
-          <SignupForm source="hero" />
-          <p className="mt-3 text-sm text-secondary">
+          <SignupForm source="hero" buttonLabel="Her Pazartesi 3 iş fikri al" />
+          <p className="mt-4 font-mono text-xs uppercase tracking-wider text-secondary">
+            3 dakika okuma · Türkiye uyum skoru · Aksiyon planı
+          </p>
+          <p className="mt-2 text-sm text-secondary">
             <span className="font-mono text-accent tabular">
               {siteConfig.subscriberCount}
             </span>{" "}
@@ -74,6 +83,22 @@ export function Hero() {
             label="haftalık açılma oranı"
           />
         </div>
+
+        {topTrend && (
+          <Link
+            href={`/trend/${topTrend.slug}`}
+            className="group mx-auto mt-10 inline-flex items-center gap-2.5 rounded-full border border-border bg-surface/60 px-4 py-2 text-sm transition-colors hover:border-accent/50"
+          >
+            <span className="font-mono text-[0.7rem] uppercase tracking-wider text-secondary">
+              Son sayıdan
+            </span>
+            <span className="text-foreground/90">{topTrend.name}</span>
+            <span className="font-mono font-semibold tabular text-accent">
+              {topTrend.score}/10
+            </span>
+            <ArrowRight className="size-4 text-secondary transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+          </Link>
+        )}
       </div>
 
       <div className="container-px mx-auto max-w-6xl">
