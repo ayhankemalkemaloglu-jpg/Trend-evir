@@ -20,6 +20,7 @@ export function SignupForm({
   buttonLabel = "Abone Ol",
   placeholder = "ornek@eposta.com",
   showCategories = false,
+  glass = false,
 }: {
   className?: string;
   source?: string;
@@ -27,6 +28,8 @@ export function SignupForm({
   placeholder?: string;
   /** Show optional interest-category toggles (saved to beehiiv). */
   showCategories?: boolean;
+  /** Translucent glassmorphism styling (for use over the Hero shader). */
+  glass?: boolean;
 }) {
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState(""); // honeypot
@@ -119,7 +122,11 @@ export function SignupForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           aria-invalid={status === "error"}
-          className="sm:flex-1"
+          className={cn(
+            "sm:flex-1",
+            glass &&
+              "border-white/20 bg-white/10 backdrop-blur-md focus-visible:border-accent focus-visible:bg-white/15",
+          )}
         />
 
         {/* Honeypot: hidden from users + assistive tech, catches bots. */}
@@ -139,7 +146,10 @@ export function SignupForm({
           type="submit"
           size="lg"
           disabled={status === "loading"}
-          className="shrink-0"
+          className={cn(
+            "shrink-0",
+            glass && "shadow-lg shadow-accent/20 transition-shadow hover:shadow-accent/40",
+          )}
         >
           {status === "loading" ? (
             <>

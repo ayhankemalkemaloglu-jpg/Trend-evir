@@ -42,7 +42,18 @@ export function Hero() {
         }}
       />
 
-      <div className="relative z-10 container-px mx-auto max-w-5xl pb-20 pt-16 text-center md:pb-28 md:pt-24">
+      {/* Readability mask — darkens the centre so the headline stays legible
+          over the moving shader; edges stay clear so the colour shows. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 50%, transparent 100%)",
+        }}
+      />
+
+      <div className="relative z-20 container-px mx-auto max-w-5xl pb-20 pt-16 text-center md:pb-28 md:pt-24">
         <p className="kicker">Her Pazartesi · 09:00</p>
 
         <h1 className="mx-auto mt-6 max-w-4xl text-balance font-serif leading-[1.02] tracking-tight text-[clamp(3rem,8vw,6rem)]">
@@ -57,7 +68,11 @@ export function Hero() {
         </p>
 
         <div id="bulten" className="mx-auto mt-10 max-w-xl scroll-mt-28">
-          <SignupForm source="hero" buttonLabel="Her Pazartesi 3 iş fikri al" />
+          <SignupForm
+            source="hero"
+            buttonLabel="Her Pazartesi 3 iş fikri al"
+            glass
+          />
           <p className="mt-4 font-mono text-xs uppercase tracking-wider text-secondary">
             3 dakika okuma · Türkiye uyum skoru · Aksiyon planı
           </p>
