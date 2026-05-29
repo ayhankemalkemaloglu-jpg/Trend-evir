@@ -1,3 +1,4 @@
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { SignupForm } from "@/components/SignupForm";
 import { siteConfig } from "@/lib/site";
 
@@ -19,6 +20,9 @@ function Stat({ value, label }: { value: string; label: string }) {
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
+      {/* animated gold-light backdrop (lazy, client-only, motion-aware) */}
+      <HeroBackdrop />
+
       {/* ambient glow */}
       <div
         aria-hidden
@@ -29,7 +33,7 @@ export function Hero() {
         }}
       />
 
-      <div className="container-px mx-auto max-w-5xl pb-20 pt-16 text-center md:pb-28 md:pt-24">
+      <div className="relative z-10 container-px mx-auto max-w-5xl pb-20 pt-16 text-center md:pb-28 md:pt-24">
         <p className="kicker">Her Pazartesi · 09:00</p>
 
         <h1 className="mx-auto mt-6 max-w-4xl text-balance font-serif leading-[1.02] tracking-tight text-[clamp(3rem,8vw,6rem)]">
