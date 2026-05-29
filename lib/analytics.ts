@@ -15,7 +15,8 @@ export type AnalyticsEvent =
   | "signup_attempted"
   | "signup_success"
   | "issue_read"
-  | "share_clicked";
+  | "share_clicked"
+  | "checklist_downloaded";
 
 export function trackEvent(
   event: AnalyticsEvent,

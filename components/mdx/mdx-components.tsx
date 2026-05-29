@@ -1,6 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
 
+import { ActionPlan } from "@/components/mdx/ActionPlan";
 import { Flag } from "@/components/Flag";
 import { cn } from "@/lib/utils";
 
@@ -91,6 +92,7 @@ export const mdxComponents = {
   Evidence,
   TurkeyAngle,
   RiskFlags,
+  ActionPlan,
   h2: (props: ComponentProps<"h2">) => (
     <h2
       {...props}
