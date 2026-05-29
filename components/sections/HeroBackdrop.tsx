@@ -2,11 +2,13 @@
 
 import dynamic from "next/dynamic";
 
-// Lazy + client-only: keeps three out of SSR and the shared bundle, so the
-// ~150 kB cost loads asynchronously on the landing page alone (after the
-// server-rendered headline has already painted — LCP is unaffected).
-const WebGLShader = dynamic(
-  () => import("@/components/ui/web-gl-shader").then((m) => m.WebGLShader),
+// Lazy + client-only: the raw-WebGL2 shader loads asynchronously on the landing
+// page alone, after the server-rendered headline has painted (LCP unaffected).
+const ShaderBackground = dynamic(
+  () =>
+    import("@/components/ui/animated-shader-hero").then(
+      (m) => m.ShaderBackground,
+    ),
   { ssr: false },
 );
 
@@ -14,9 +16,9 @@ export function HeroBackdrop() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent)]"
     >
-      <WebGLShader className="opacity-70" />
+      <ShaderBackground className="opacity-80" />
     </div>
   );
 }
